@@ -1,0 +1,1 @@
+from .baostock import BaoStockProviderInitGUI
