@@ -20,6 +20,7 @@ from qstock_plotter.widgets.colorful_toggle_button import ColorfulToggleButton
 from typing import Optional
 from ...libs.style import make_style
 from qstock_plotter.libs.helpers import ConfigurationsHandler
+from typing import Sequence
 
 
 class TradeInfoLineItem(PlotCurveItem):
@@ -346,17 +347,30 @@ class ControlPannel(QWidget):
         self.lines[line_name].setData(xs, ys)
         self.profit_plot.refresh_bounding()
 
+    def _set_line_data(self, line_name: str, x:Sequence[int], y: Sequence[float]):
+        self.lines[line_name].setData(np.asarray(x), np.asarray(y))
+        self.profit_plot.refresh_bounding()
+
     def set_plot_x_ticks(self, x_ticks):
         self.profit_plot.getAxis("bottom").set_tick_strings(x_ticks)
 
     def update_current_money_plot(self, y: float):
         self._update_line_data("current", y)
+    
+    def set_current_money_plot(self, x:Sequence[int], y: Sequence[float]):
+        self._set_line_data("current", x, y)
 
     def update_invested_money_plot(self, y: float):
         self._update_line_data("invested", y)
 
+    def set_invested_money_plot(self, x:Sequence[int], y: Sequence[float]):
+        self._set_line_data("invested", x, y)
+
     def update_avaliable_money_plot(self, y: float):
         self._update_line_data("avaliable", y)
+
+    def set_avaliable_money_plot(self, x:Sequence[int], y: Sequence[float]):
+        self._set_line_data("avaliable", x, y)
 
 
 if __name__ == "__main__":

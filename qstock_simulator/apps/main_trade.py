@@ -3,6 +3,7 @@ from ..components.basic_info import BasicInfoComponent
 from ..libs.trade_core import TradeCore, BuyState, SellState
 from qstock_plotter.libs.data_handler import DataHandler
 from typing import Optional
+import os
 
 
 class MainTrade(TradeWindow):
@@ -15,6 +16,7 @@ class MainTrade(TradeWindow):
         current_index: int,
         trade_core: TradeCore,
         start_trade_index: Optional[int] = None,
+        log_file_path: Optional[str] = None,
         parent=None,
     ):
         super().__init__(parent=parent)
@@ -64,7 +66,7 @@ class MainTrade(TradeWindow):
         self.trade_core = trade_core
         t, initial, close, high, low = self.day_data.prices[self.current_index]
         self.trade_core.current_price = close
-        self._update_trade_state()
+        self._update_info_table()
         # connect signals
         self.control_pannel.control_command_bar.next_day_action.triggered.connect(
             self.on_move_next_day
@@ -81,11 +83,107 @@ class MainTrade(TradeWindow):
         self.control_pannel.control_command_bar.sell_amount_box.valueChanged.connect(
             self.on_sell_amount_changed
         )
+        # trade plot update from log file
+        self.log_file_path=log_file_path
+        if self.log_file_path is None or not os.path.isdir(self.log_file_path):
+            self._update_trade_plot()
+        else:
+            if not os.path.exists(self.log_file_path):
+                os.makedirs(self.log_file_path)
+            state_log_valid, state_log_not_empty = self._read_state_log()
+            if state_log_valid:
+                if not state_log_not_empty:
+                    self._update_trade_plot()
+            else:
+                self.show_error_info(title="Invalid log file",content="Invalid state log file")
+            self._read_action_log()
         # other settings
         if self.current_index == self.end_index:
             self.on_finish_simulation()
 
-    def _update_trade_state(self):
+    @property
+    def trade_state_log_path(self):
+        if self.log_file_path is None:
+            return None
+        return os.path.join(self.log_file_path,"state.log")
+    
+    @property
+    def trade_action_log_path(self):
+        if self.log_file_path is None:
+            return None
+        return os.path.join(self.log_file_path,"action.log")
+
+
+    def _read_state_log(self,log_file_path:str=None):
+        log_file_path = log_file_path if log_file_path is not None else self.trade_state_log_path
+        current=[];invested=[];avaliable=[]
+        try:
+            if not os.path.exists(log_file_path):
+                with open(log_file_path,"w") as f:
+                    f.write("#current,invested,avaliable\n")
+                return True,False
+            with open(log_file_path,"r") as f:
+                lines = f.readlines()
+            for line in lines:
+                if not line.startswith("#"):
+                    line = line.strip().split(",")
+                    current.append(float(line[0]))
+                    invested.append(float(line[1]))
+                    avaliable.append(float(line[2]))
+            if len(current) == 0:
+                return True,False
+            self.control_pannel.set_current_money_plot(current)
+            self.control_pannel.set_invested_money_plot(invested)
+            self.control_pannel.set_avaliable_money_plot(avaliable)
+            return True,True
+        except Exception as e:
+            return False,False
+        
+    def _write_state_log(self,
+                         current:float,
+                         invested:float,
+                         avaliable:float,
+                         log_file_path:str=None):
+        log_file_path = log_file_path if log_file_path is not None else self.trade_state_log_path
+        if log_file_path is not None:
+            try:
+                with open(log_file_path,"a") as f:
+                    f.write(f"{current},{invested},{avaliable}\n")
+            except Exception as e:
+                self.show_error_info(title="Log error",content="Failed to write state log")
+
+        
+    def _read_action_log(self,log_file_path:str=None):
+        log_file_path = log_file_path if log_file_path is not None else self.trade_action_log_path
+        try:
+            if not os.path.exists(log_file_path):
+                with open(log_file_path,"w") as f:
+                    f.write("#action(buy or sell),day\n")
+                return None
+            with open(log_file_path,"r") as f:
+                lines = f.readlines()
+            for line in lines:
+                if not line.startswith("#"):
+                    line = line.strip().split(",")
+                    if line[0] == "b":
+                        self.basic_info_component.add_buy_line(int(line[1]))
+                    elif line[0] == "s":
+                        self.basic_info_component.add_sell_line(int(line[1]))
+        except Exception as e:
+            self.show_error_info(title="Invalid log file",content="Invalid action log file")
+
+    def _write_action_log(self,action:str,day:int,log_file_path:str=None):
+        log_file_path = log_file_path if log_file_path is not None else self.trade_action_log_path
+        if log_file_path is not None:
+            try:
+                if action not in ["b","s"]:
+                    self.show_error_info(title="Invalid action",content="Invalid action for log")
+                with open(log_file_path,"a") as f:
+                    f.write(f"{action},{day}\n")
+            except Exception as e:
+                self.show_error_info(title="Log error",content="Failed to write action log")
+
+    def _update_info_table(self):
         self.control_pannel.trade_info_table.update_info(
             initial=self.trade_core.initial_money,
             avaliable=self.trade_core.avaliable_money,
@@ -96,6 +194,8 @@ class MainTrade(TradeWindow):
         self.control_pannel.control_command_bar.buy_money_label.setText(
             f"={self.trade_core.current_price*self.control_pannel.control_command_bar.buy_amount_box.value():.2f}"
         )
+    
+    def _update_trade_plot(self):
         self.control_pannel.update_avaliable_money_plot(self.trade_core.avaliable_money)
         self.control_pannel.update_invested_money_plot(self.trade_core.invested_money)
         self.control_pannel.update_current_money_plot(
@@ -103,11 +203,20 @@ class MainTrade(TradeWindow):
         )
         self.control_pannel.profit_plot.full_range()
 
-    def on_move_next_day(self):
-        self.current_index += 1
+    def _update_trade_state(self):
+        self._update_info_table()
+        self._update_trade_plot()
+
+    def _move_to_next_day_trade_core(self):
         t, initial, close, high, low = self.day_data.prices[self.current_index]
         self.trade_core.move_to_next_day(close)
+
+    def _move_to_next_day_widget(self):
+        self.current_index += 1
         self._update_trade_state()
+        self._write_state_log(self.trade_core.avaliable_money+self.trade_core.invested_money,
+                                    self.trade_core.invested_money,
+                                    self.trade_core.avaliable_money)
         self.control_pannel.progress_ring.setValue(
             self.current_index - self.start_trade_index
         )
@@ -120,8 +229,13 @@ class MainTrade(TradeWindow):
         if self.current_index == self.end_index:
             self.on_finish_simulation()
 
+
+    def on_move_next_day(self):
+        self._move_to_next_day_trade_core()
+        self._move_to_next_day_widget()
+
     def on_buy_stock(self):
-        self.on_move_next_day()
+        self._move_to_next_day_trade_core()
         num_stock = self.control_pannel.control_command_bar.buy_amount_box.value()
         state, invested = self.trade_core.buy(num_stock)
         if state == BuyState.NOT_ENOUGH_MONEY:
@@ -137,7 +251,6 @@ class MainTrade(TradeWindow):
                 content="You can't buy {} stocks".format(num_stock),
             )
         else:
-            self._update_trade_state()
             if state == BuyState.BUY_MAXIMUM:
                 self.show_warning_info(
                     title="Buy maximum",
@@ -151,9 +264,11 @@ class MainTrade(TradeWindow):
                     ),
                 )
             self.basic_info_component.add_buy_line(self.current_index)
+            self._write_action_log("b",self.current_index)
+        self._move_to_next_day_widget()
 
     def on_sell_stock(self):
-        self.on_move_next_day()
+        self._move_to_next_day_trade_core()
         num_stock = self.control_pannel.control_command_bar.sell_amount_box.value()
         state, avaliable = self.trade_core.sell(num_stock)
         if state == SellState.SUCCESS:
@@ -165,10 +280,12 @@ class MainTrade(TradeWindow):
                 ),
             )
             self.basic_info_component.add_sell_line(self.current_index)
+            self._write_action_log("s",self.current_index)
         else:
             self.show_error_info(
                 title="Sell failed", content="You don't have enough stocks to sell"
             )
+        self._move_to_next_day_widget()
 
     def on_finish_simulation(self):
         self.control_pannel.control_command_bar.next_day_action.setDisabled(True)
