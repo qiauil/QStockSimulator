@@ -1,6 +1,7 @@
 from ..gui.window.trade_window import TradeWindow
 from ..components.basic_info import BasicInfoComponent
 from ..libs.trade_core import TradeCore, BuyState, SellState
+from ..libs.io import save_trade_state
 from qstock_plotter.libs.data_handler import DataHandler
 from typing import Optional
 import os
@@ -120,16 +121,16 @@ class MainTrade(TradeWindow):
         try:
             if not os.path.exists(log_file_path):
                 with open(log_file_path,"w") as f:
-                    f.write("#current,invested,avaliable\n")
+                    f.write("#avaliable_money,current_price,invested_money,invested_stock,handling_fee_total\n")
                 return True,False
             with open(log_file_path,"r") as f:
                 lines = f.readlines()
             for line in lines:
                 if not line.startswith("#"):
                     line = line.strip().split(",")
-                    current.append(float(line[0]))
-                    invested.append(float(line[1]))
-                    avaliable.append(float(line[2]))
+                    avaliable.append(float(line[0]))
+                    current.append(float(line[1]))
+                    invested.append(float(line[2])) 
             if len(current) == 0:
                 return True,False
             self.control_pannel.set_current_money_plot(current)
@@ -140,15 +141,11 @@ class MainTrade(TradeWindow):
             return False,False
         
     def _write_state_log(self,
-                         current:float,
-                         invested:float,
-                         avaliable:float,
                          log_file_path:str=None):
         log_file_path = log_file_path if log_file_path is not None else self.trade_state_log_path
         if log_file_path is not None:
             try:
-                with open(log_file_path,"a") as f:
-                    f.write(f"{current},{invested},{avaliable}\n")
+                save_trade_state(log_file_path,self.trade_core)
             except Exception as e:
                 self.show_error_info(title="Log error",content="Failed to write state log")
 
@@ -214,9 +211,7 @@ class MainTrade(TradeWindow):
     def _move_to_next_day_widget(self):
         self.current_index += 1
         self._update_trade_state()
-        self._write_state_log(self.trade_core.avaliable_money+self.trade_core.invested_money,
-                                    self.trade_core.invested_money,
-                                    self.trade_core.avaliable_money)
+        self._write_state_log()
         self.control_pannel.progress_ring.setValue(
             self.current_index - self.start_trade_index
         )

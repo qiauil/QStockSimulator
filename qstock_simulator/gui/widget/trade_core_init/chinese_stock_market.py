@@ -2,15 +2,6 @@ from PyQt6.QtCore import QDate
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QGridLayout
 from qfluentwidgets import CalendarPicker, BodyLabel, DoubleSpinBox
 
-'''
-avaliable_money:float=0.0,
-current_price:float=0.0,
-commission_rate:float=0.0003,
-min_commission:float=5.0,
-tax_rate:float=0.001,
-transfer_fee_rate:float=0.00001,
-trade_fee_rate:float=0.0000341
-'''
 
 class ChineseStockMarketTradeCoreInitGUI(QWidget):
     def __init__(self, parent=None):

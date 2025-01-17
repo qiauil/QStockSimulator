@@ -1,14 +1,18 @@
 from ..gui.window.data_selector import DataSelector
 from ..libs.data.provider import BaoStockDataProviderGUISetup
 from ..libs.trade_core import ChineseStockMarketTradeCoreGUISetup
+from ..libs.io import create_project
 from .main_trade import MainTrade
 from PyQt6.QtCore import pyqtSignal
 import random
+from typing import Optional
 class GUISetup(DataSelector):
 
     sigShowError = pyqtSignal(str, str)
 
-    def __init__(self, parent=None):
+    def __init__(self, 
+                 project_dir:Optional[str]=None,
+                 parent=None):
         super().__init__([BaoStockDataProviderGUISetup()],
                          [ChineseStockMarketTradeCoreGUISetup()],
                           parent)
@@ -19,6 +23,7 @@ class GUISetup(DataSelector):
         self.trade_config.back_clicked.connect(self.back_trade_config)
         self.trade_config.next_clicked.connect(self.next_trade_config)
         self.sigShowError.connect(self.show_error_info)
+        self.project_dir = project_dir
         
     def next_provider_init(self):
         self.progressive_run(self._next_provider_init, message="Loading stock list...")
@@ -56,13 +61,22 @@ class GUISetup(DataSelector):
             avaliable_money=self.trade_config.initial_avaliable_amount*current_price,
             current_price= current_price,
         )
+        if self.project_dir is not None:
+            create_project(self.project_dir,
+                           self.data_handler,
+                           trade_core,
+                           start_index=0,
+                           end_index=end_index,
+                           current_index=start_trade_index,
+                           start_trade_index=start_trade_index)
         self.hide()
         window = MainTrade(data_handler=self.data_handler,
                            start_index=0,
                            current_index=start_trade_index,
                            end_index=end_index,
                            trade_core=trade_core,
-                           start_trade_index=start_trade_index,)
+                           start_trade_index=start_trade_index,
+                           project_dir=self.project_dir)
         window.show()
 
 

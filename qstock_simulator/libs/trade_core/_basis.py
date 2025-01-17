@@ -1,5 +1,7 @@
 from enum import Enum
 from PyQt6.QtWidgets import QWidget
+from ...libs.config import InitParaRecorder
+from typing import Union,Sequence
 
 class BuyState(Enum):
     SUCCESS = 1
@@ -11,7 +13,7 @@ class SellState(Enum):
     SUCCESS = 1
     NOT_ALLOWED_AMOUNT = 2
 
-class TradeCore():
+class TradeCore(InitParaRecorder):
 
     def __init__(self,
                  avaliable_money:float=0.0,
@@ -25,6 +27,32 @@ class TradeCore():
         self.invested_money = 0.0
         self.invested_stock = 0
         self.handling_fee_total = 0.0
+
+    def state(self,return_dict=False):
+        if return_dict:
+            return {
+                "avaliable_money":self.avaliable_money,
+                "current_price":self.current_price,
+                "invested_money":self.invested_money,
+                "invested_stock":self.invested_stock,
+                "handling_fee_total":self.handling_fee_total
+            }
+        else:
+            return [self.avaliable_money,self.current_price,self.invested_money,self.invested_stock,self.handling_fee_total]
+        
+    def load_state(self,state:Union[dict,Sequence]):
+        if isinstance(state,dict):
+            self.avaliable_money = state["avaliable_money"]
+            self.current_price = state["current_price"]
+            self.invested_money = state["invested_money"]
+            self.invested_stock = state["invested_stock"]
+            self.handling_fee_total = state["handling_fee_total"]
+        else:
+            self.avaliable_money = state[0]
+            self.current_price = state[1]
+            self.invested_money = state[2]
+            self.invested_stock = state[3]
+            self.handling_fee_total = state[4]
 
     def move_to_next_day(self,next_day_price:float):
         self.current_price = next_day_price
