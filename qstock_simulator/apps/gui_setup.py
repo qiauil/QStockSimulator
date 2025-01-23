@@ -76,7 +76,7 @@ class GUISetup(DataSelector):
                            end_index=end_index,
                            trade_core=trade_core,
                            start_trade_index=start_trade_index,
-                           project_dir=self.project_dir)
+                           log_file_path=self.project_dir)
         window.show()
 
 
