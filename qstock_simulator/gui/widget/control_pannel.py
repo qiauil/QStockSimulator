@@ -13,7 +13,6 @@ from qfluentwidgets import (
     BodyLabel,
     SpinBox,
     ProgressRing,
-    ProgressBar,
 )
 from qstock_plotter.widgets.q_plot_widget import QPlotWidget
 from qstock_plotter.widgets.colorful_toggle_button import ColorfulToggleButton
@@ -213,13 +212,13 @@ class TradeInfoTabel(QWidget):
         self.current_amount_label.setText(str(current))
         profit = current - initial
         if profit == 0:
-            self.profit_label.setTextColor(QColor(0, 0, 0))
+            self.profit_label.setTextColor(QColor(0, 0, 0),QColor(255, 255, 255))
             self.profit_label.setText("0(0%)")
         elif profit > 0:
-            self.profit_label.setTextColor(self.plot_style.positive_color)
+            self.profit_label.setTextColor(self.plot_style.positive_color,self.plot_style.positive_color)
             self.profit_label.setText(f"+{profit:.2f}({profit/initial*100:.2f}%)")
         else:
-            self.profit_label.setTextColor(self.plot_style.negative_color)
+            self.profit_label.setTextColor(self.plot_style.negative_color,self.plot_style.negative_color)
             self.profit_label.setText(f"-{profit:.2f}({profit/initial*100:.2f}%)")
 
 
@@ -261,7 +260,7 @@ class ControlPannel(QWidget):
         self.profit_plot = QPlotWidget(parent=self)
         # self.profit_plot.setMinimumHeight(5)
         self.info_plot_layout.addWidget(self.profit_plot)
-        self.info_plot_card.setFixedHeight(250)
+        self.info_plot_card.setMaximumHeight(250)
 
         self.main_layout.addWidget(self.info_plot_card)
         self.main_layout.addWidget(self.command_card)

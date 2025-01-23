@@ -31,7 +31,7 @@ class StockInfoBar(QWidget):
         self.end_value_label, end_value_layout = self._creat_label_groups("End:", return_layout=True)
         self.end_value_label.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.price_change_label = BodyLabel("(+32, +0.32%)")
-        self.price_change_label.setTextColor(QColor("green"))
+        self.price_change_label.setTextColor(QColor("green"),QColor("green"))
         self.price_change_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
         #self.price_change_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         end_value_layout.addWidget(self.price_change_label)
@@ -99,10 +99,10 @@ class StockInfoBar(QWidget):
         initial=float(self.initial_value_label.text())
         end=float(self.end_value_label.text())
         if end > initial:
-            self.price_change_label.setTextColor(positive_color)
+            self.price_change_label.setTextColor(positive_color,positive_color)
             self.price_change_label.setText(f"(+{end-initial:.2f}, +{100*(end-initial)/initial:.2f}%)")
         else:
-            self.price_change_label.setTextColor(negative_color)
+            self.price_change_label.setTextColor(negative_color,negative_color)
             self.price_change_label.setText(f"(-{initial-end:.2f}, -{100*(initial-end)/initial:.2f}%)")
         highest = float(self.highest_value_label.text())
         lowest = float(self.lowest_value_label.text())
