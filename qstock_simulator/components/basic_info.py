@@ -5,6 +5,7 @@ from qstock_plotter.libs.data_handler import TradeData
 import pandas as pd
 import pyqtgraph as pg
 from pyqtgraph import PlotCurveItem
+from qfluentwidgets import Action, FluentIcon
 
 
 class BasicInfoComponent:
@@ -25,6 +26,43 @@ class BasicInfoComponent:
             self.style = kwargs["style"]
         else:
             self.style = make_style()
+        # initialize menus
+        self.hide_info_action = Action("Stock info bar", parent=widget_parent)
+        self.hide_info_action.setIcon(FluentIcon.VIEW)
+        def hide_info_action_triggered():
+            if self.widget.day_plotter.info_bar.isVisible():
+                self.widget.set_info_bar_visible(False)
+                self.hide_info_action.setIcon(FluentIcon.HIDE)
+            else:
+                self.widget.set_info_bar_visible(True)
+                self.hide_info_action.setIcon(FluentIcon.VIEW)
+        self.hide_info_action.triggered.connect(hide_info_action_triggered)
+        self.hide_volume_action = Action("Volume plot", parent=widget_parent)
+        self.hide_volume_action.setIcon(FluentIcon.VIEW)
+        def hide_volume_action_triggered():
+            if self.widget.day_plotter.volume_plotter.isVisible():
+                self.widget.set_volume_plot_visible(False)
+                self.hide_volume_action.setIcon(FluentIcon.VIEW)
+            else:
+                self.widget.set_volume_plot_visible(True)
+                self.hide_volume_action.setIcon(FluentIcon.HIDE)
+        self.hide_volume_action.triggered.connect(hide_volume_action_triggered)
+        """
+        self.hide_price_action = Action("Price plot", parent=widget_parent)
+        self.hide_price_action.setIcon(FluentIcon.VIEW)
+        def hide_price_action_triggered():
+            if self.widget.day_plotter.price_plotter.isVisible():
+                self.widget.set_price_plot_visible(False)
+                self.hide_price_action.setIcon(FluentIcon.VIEW)
+            else:
+                self.widget.set_price_plot_visible(True)
+                self.hide_price_action.setIcon(FluentIcon.HIDE)
+        self.hide_price_action.triggered.connect(hide_price_action_triggered)
+        """
+        if hasattr(widget_parent, "menu"):
+            widget_parent.menu.insertAction(widget_parent.menu.actions()[0], self.hide_info_action)
+            widget_parent.menu.insertAction(widget_parent.menu.actions()[0], self.hide_volume_action)
+            #widget_parent.menu.insertAction(widget_parent.menu.actions()[0], self.hide_price_action)
 
     def initialze(
         self, data_handler: DataHandler, start_index: int, current_index: int
@@ -60,14 +98,17 @@ class BasicInfoComponent:
             end_index = max(end_index, 0)
             return start_index, end_index
 
-        if self.week_data is not None:
-            self._week_start_index, self._week_end_index = find_index(self.week_data)
-        if self.month_data is not None:
-            self._month_start_index, self._month_end_index = find_index(self.month_data)
+        self._week_start_index, self._week_end_index = find_index(self.week_data)
+        self._month_start_index, self._month_end_index = find_index(self.month_data)
 
         self._move_day_view()
         self._move_week_view()
         self._move_month_view()
+
+        if self._first_initilized:
+            self.hide_volume_action.setIcon(FluentIcon.HIDE)
+            for plotter in [self.widget.day_plotter, self.widget.week_plotter, self.widget.month_plotter]:
+                plotter.volume_card.hide()
 
         self._first_initilized = False
 

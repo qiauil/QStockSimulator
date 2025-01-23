@@ -125,6 +125,8 @@ class DWMPriceVolumePlotter(QWidget):
         self.main_layout.addWidget(self.data_navigation_widget)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
+        self._price_plotter_visible = True
+        self._volume_plotter_visible = True
 
     def add_day_data(self, 
                      day_data:TradeData
@@ -136,6 +138,8 @@ class DWMPriceVolumePlotter(QWidget):
             self.data_navigation_widget.addSubInterface(
                 self.day_plotter, "Day_plotter", "Day"
             )
+            self.day_plotter.price_card.setVisible(self._price_plotter_visible)
+            self.day_plotter.volume_card.setVisible(self._volume_plotter_visible)
         self.day_plotter.plot_trade_data(day_data)
 
     def add_week_data(self, 
@@ -148,6 +152,8 @@ class DWMPriceVolumePlotter(QWidget):
             self.data_navigation_widget.addSubInterface(
                 self.week_plotter, "Week_plotter", "Week"
             )
+            self.week_plotter.price_card.setVisible(self._price_plotter_visible)
+            self.week_plotter.volume_card.setVisible(self._volume_plotter_visible)
         self.week_plotter.plot_trade_data(week_data)
 
     def add_month_data(self,
@@ -160,6 +166,8 @@ class DWMPriceVolumePlotter(QWidget):
             self.data_navigation_widget.addSubInterface(
                 self.month_plotter, "Month_plotter", "Month"
             )
+            self.month_plotter.price_card.setVisible(self._price_plotter_visible)
+            self.month_plotter.volume_card.setVisible(self._volume_plotter_visible)
         self.month_plotter.plot_trade_data(month_data)
 
     def add_data_handler(self, data_handler: HDF5Handler):
@@ -170,6 +178,24 @@ class DWMPriceVolumePlotter(QWidget):
     def _create_plotter(self,*args, **kwargs):
         return PriceVolumePlotter(*args, **kwargs)
 
+    def set_volume_plot_visible(self,visible:bool):
+        self._volume_plotter_visible = visible
+        if self.day_plotter is not None:
+            self.day_plotter.volume_card.setVisible(visible)
+        if self.week_plotter is not None:
+            self.week_plotter.volume_card.setVisible(visible)
+        if self.month_plotter is not None:
+            self.month_plotter.volume_card.setVisible(visible)
+
+    def set_price_plot_visible(self,visible:bool):
+        self._price_plotter_visible = visible
+        if self.day_plotter is not None:
+            self.day_plotter.price_card.setVisible(visible)
+        if self.week_plotter is not None:
+            self.week_plotter.price_card.setVisible(visible)
+        if self.month_plotter is not None:
+            self.month_plotter.price_card.setVisible(visible)
+
 class DWMPriceVolumeInfoPlotter(DWMPriceVolumePlotter):
 
     def __init__(self, parent = None):
@@ -177,9 +203,37 @@ class DWMPriceVolumeInfoPlotter(DWMPriceVolumePlotter):
         self.day_plotter: Optional[PriceVolumeInfoPlotter] = None
         self.week_plotter: Optional[PriceVolumeInfoPlotter] = None
         self.month_plotter: Optional[PriceVolumeInfoPlotter] = None
+        self._info_bar_visible = True
 
     def _create_plotter(self,*args, **kwargs):
         return PriceVolumeInfoPlotter(*args, **kwargs)
+
+    def set_info_bar_visible(self,visible:bool):
+        self._info_bar_visible = visible
+        if self.day_plotter is not None:
+            self.day_plotter.info_bar.setVisible(visible)
+        if self.week_plotter is not None:
+            self.week_plotter.info_bar.setVisible(visible)
+        if self.month_plotter is not None:
+            self.month_plotter.info_bar.setVisible(visible)
+
+    def add_day_data(self, day_data):
+        day_plotter_is_none = self.day_plotter is None
+        super().add_day_data(day_data)
+        if day_plotter_is_none:
+            self.day_plotter.info_bar.setVisible(self._info_bar_visible)
+
+    def add_week_data(self, week_data):
+        week_plotter_is_none = self.week_plotter is None
+        super().add_week_data(week_data)
+        if week_plotter_is_none:
+            self.week_plotter.info_bar.setVisible(self._info_bar_visible)
+    
+    def add_month_data(self, month_data):
+        month_plotter_is_none = self.month_plotter is None
+        super().add_month_data(month_data)
+        if month_plotter_is_none:
+            self.month_plotter.info_bar.setVisible(self._info_bar_visible)
 
 if __name__ == "__main__":
     import sys

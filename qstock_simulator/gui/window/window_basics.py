@@ -2,8 +2,7 @@ from ..widget.progress_message_box import ProgressMessageBox
 from ...libs.utils import FunctionThread
 from qfluentwidgets.components.widgets.frameless_window import FramelessWindow
 from qfluentwidgets.common.animation import BackgroundAnimationWidget
-from qfluentwidgets import isDarkTheme, qconfig, FluentStyleSheet
-from qfluentwidgets import FluentTitleBar
+from qfluentwidgets import isDarkTheme, qconfig, FluentTitleBar, TransparentToolButton, FluentIcon, RoundMenu, MenuAnimationType
 from PyQt6.QtWidgets import QHBoxLayout,QVBoxLayout
 from PyQt6.QtGui import QColor,QIcon,QPainter
 from PyQt6.QtCore import Qt,pyqtSignal, QThread
@@ -63,6 +62,20 @@ class DefaultWindow(BackgroundAnimationWidget,FramelessWindow):
 
     def isMicaEffectEnabled(self):
         return self._isMicaEnabled
+    
+class TitleMenuWindow(DefaultWindow):
+    def __init__(self, parent=None,main_lyout_direction: Literal["horizontal", "vertical"] = "horizontal"):
+        super().__init__(parent, main_lyout_direction)
+        self.menu_button = TransparentToolButton(parent=self)
+        self.menu_button.setIcon(FluentIcon.MENU)
+        self.menu_button.setFixedSize(24, 24)
+        self.title_bar.hBoxLayout.insertWidget(0, self.menu_button, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.title_bar.hBoxLayout.insertSpacing(1, 12)
+        self.menu=RoundMenu(parent=self)
+        self.menu_button.clicked.connect(
+            lambda:self.menu.exec(self.menu_button.mapToGlobal(self.menu_button.rect().bottomLeft())
+                                  , aniType=MenuAnimationType.DROP_DOWN)
+        )
 
 class ProgressiveWindow(DefaultWindow):
     def __init__(self, parent=None,main_lyout_direction: Literal["horizontal", "vertical"] = "horizontal"):
@@ -95,6 +108,7 @@ class ProgressiveWindow(DefaultWindow):
 
     def update_progress_message(self, message: str):
         self.progress_message_box.set_content(message)
+
 
 if __name__ == "__main__":
     import sys

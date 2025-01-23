@@ -234,6 +234,7 @@ class ControlPannel(QWidget):
         self.setLayout(self.main_layout)
 
         self.command_card = SimpleCardWidget(parent=self)
+        self.command_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.command_card)
         self.command_card_layout = QHBoxLayout()
         self.command_card.setLayout(self.command_card_layout)
@@ -260,6 +261,7 @@ class ControlPannel(QWidget):
         self.profit_plot = QPlotWidget(parent=self)
         # self.profit_plot.setMinimumHeight(5)
         self.info_plot_layout.addWidget(self.profit_plot)
+        self.info_plot_card.setFixedHeight(250)
 
         self.main_layout.addWidget(self.info_plot_card)
         self.main_layout.addWidget(self.command_card)
