@@ -2,7 +2,7 @@ from ..widget.progress_message_box import ProgressMessageBox
 from ...libs.utils import FunctionThread
 from qfluentwidgets.components.widgets.frameless_window import FramelessWindow
 from qfluentwidgets.common.animation import BackgroundAnimationWidget
-from qfluentwidgets import isDarkTheme, qconfig, FluentTitleBar, TransparentToolButton, FluentIcon, RoundMenu, MenuAnimationType
+from qfluentwidgets import isDarkTheme, qconfig, FluentTitleBar, TransparentToolButton, FluentIcon, RoundMenu, MenuAnimationType, Action, setTheme, Theme, CheckableMenu, MenuIndicatorType
 from PyQt6.QtWidgets import QHBoxLayout,QVBoxLayout
 from PyQt6.QtGui import QColor,QIcon,QPainter
 from PyQt6.QtCore import Qt,pyqtSignal, QThread
@@ -64,7 +64,10 @@ class DefaultWindow(BackgroundAnimationWidget,FramelessWindow):
         return self._isMicaEnabled
     
 class TitleMenuWindow(DefaultWindow):
-    def __init__(self, parent=None,main_lyout_direction: Literal["horizontal", "vertical"] = "horizontal"):
+    def __init__(self, parent=None,
+                 main_lyout_direction: Literal["horizontal", "vertical"] = "horizontal",
+                 change_theme_action: bool = True
+                 ):
         super().__init__(parent, main_lyout_direction)
         self.menu_button = TransparentToolButton(parent=self)
         self.menu_button.setIcon(FluentIcon.MENU)
@@ -74,12 +77,39 @@ class TitleMenuWindow(DefaultWindow):
         self.menu=RoundMenu(parent=self)
         self.menu_button.clicked.connect(
             lambda:self.menu.exec(self.menu_button.mapToGlobal(self.menu_button.rect().bottomLeft())
-                                  , aniType=MenuAnimationType.DROP_DOWN)
+                                  , aniType=MenuAnimationType.FADE_IN_DROP_DOWN)
         )
+        if change_theme_action:
+            auto_action=Action("Auto")
+            auto_action.setIcon(FluentIcon.CONSTRACT)
+            def auto_action_triggered():
+                setTheme(Theme.AUTO)
+                auto_action.setChecked(True)
+            auto_action.triggered.connect(auto_action_triggered)
+            light_action=Action("Light")
+            light_action.setIcon(FluentIcon.BRIGHTNESS)
+            def light_action_triggered():
+                setTheme(Theme.LIGHT)
+                auto_action.setChecked(False)
+            light_action.triggered.connect(light_action_triggered)
+            dark_action=Action("Dark")
+            dark_action.setIcon(FluentIcon.QUIET_HOURS)
+            def dark_action_triggered():
+                setTheme(Theme.DARK)
+                auto_action.setChecked(False)
+            dark_action.triggered.connect(dark_action_triggered)
+            change_theme_menu=CheckableMenu("Theme",indicatorType=MenuIndicatorType.RADIO)
+            change_theme_menu.addAction(light_action)
+            change_theme_menu.addAction(dark_action)
+            change_theme_menu.addAction(auto_action)
+            change_theme_menu.setIcon(FluentIcon.PALETTE)
+            self.menu.addMenu(change_theme_menu)
+            auto_action.setCheckable(True)
+            dark_action.setCheckable(True)
+            light_action.setCheckable(True)
+            auto_action.setChecked(True)
 
-class ProgressiveWindow(DefaultWindow):
-    def __init__(self, parent=None,main_lyout_direction: Literal["horizontal", "vertical"] = "horizontal"):
-        super().__init__(parent,main_lyout_direction)
+class ProgressiveMixin:
 
     def progressive_run(self, func,
                         message: str="Loading...",

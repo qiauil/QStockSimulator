@@ -147,7 +147,7 @@ class MainTrade(TradeWindow):
             try:
                 save_trade_state(log_file_path,self.trade_core)
             except Exception as e:
-                self.show_error_info(title="Log error",content="Failed to write state log")
+                self.show_error_info(title="Log error",content="Failed to write state log:{}".format(str(e)))
 
         
     def _read_action_log(self,log_file_path:str=None):
@@ -178,7 +178,7 @@ class MainTrade(TradeWindow):
                 with open(log_file_path,"a") as f:
                     f.write(f"{action},{day}\n")
             except Exception as e:
-                self.show_error_info(title="Log error",content="Failed to write action log")
+                self.show_error_info(title="Log error",content="Failed to write action log: {}".format(str(e)))
 
     def _update_info_table(self):
         self.control_pannel.trade_info_table.update_info(

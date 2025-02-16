@@ -18,6 +18,7 @@ class TradeCore(InitParaRecorder):
     def __init__(self,
                  avaliable_money:float=0.0,
                  current_price:float=0.0):
+        super().__init__()
         self.initialize(avaliable_money,current_price)
 
     def initialize(self,avaliable_money:float,current_price:float=0.0):
@@ -75,9 +76,12 @@ class TradeCore(InitParaRecorder):
                 state=BuyState.SUCCESS
             self.invested_stock += num_stock
             handle_fee = self.handling_fee_buy(num_stock)
+            print(f"handle_fee:{handle_fee}")
             self.handling_fee_total += handle_fee
             new_invested=num_stock * self.current_price
+            print(f"new_invested:{new_invested}")
             self.avaliable_money -= (new_invested + handle_fee)
+            print(f"avaliable_money:{self.avaliable_money}")
             self.invested_money += new_invested
             return state,new_invested
         return BuyState.NOT_ALLOWED_AMOUNT,0.0

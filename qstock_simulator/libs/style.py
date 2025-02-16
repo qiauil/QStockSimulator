@@ -1,6 +1,15 @@
 import qstock_plotter.libs.style as style
 from qstock_plotter.libs.helpers import ConfigurationsHandler
 from qstock_plotter.libs.helpers import tuple_to_color,color_to_rbg_tuple
+from enum import Enum
+from qfluentwidgets import FluentIconBase, getIconColor, Theme
+from PyQt6 import QtCore
+import os
+
+file_path = os.path.realpath(__file__)
+resource_path=os.path.abspath(os.path.join(file_path,os.pardir,os.pardir,"resources"))
+QtCore.QDir.addSearchPath('icons', os.path.join(resource_path,"icon")+os.sep)
+print(os.path.join(resource_path,"icon"))
 
 def default_style_configs() -> ConfigurationsHandler:
     handler=style.default_style_configs()
@@ -41,3 +50,17 @@ def make_style(style_yaml_file="",**kwargs):
             configs_handler.set_config_items_from_yaml(style_yaml_file)
     configs_handler.set_config_items(**kwargs)
     return configs_handler.configs()
+
+class Icon(FluentIconBase, Enum):
+
+    OPEN = "open"
+    NEWPROJECT = "new_project"
+    DATA= "data"
+    NUMBER="number"
+    SELECTED="selected"
+    RULER="ruler"
+    CODE="Code"
+    MONEY="money"
+
+    def path(self, theme=Theme.AUTO):
+        return f"icons:{self.value}_{getIconColor(theme)}.svg"

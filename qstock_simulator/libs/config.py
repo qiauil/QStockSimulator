@@ -115,7 +115,7 @@ class InitParaRecorder():
     """
 
     def __init__(self) -> None:
-        self.init_paras={}
+        self.init_paras = {}
         self.collect_init_paras()
 
     def collect_init_paras(self):

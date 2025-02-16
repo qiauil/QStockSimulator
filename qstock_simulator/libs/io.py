@@ -7,7 +7,7 @@ from . import trade_core
 def save_trade_state(log_file_path: str, trade_core: TradeCore):
 
     with open(log_file_path, "a") as f:
-        f.write(",".join(trade_core.state()) + os.linesep)
+        f.write(",".join([str(i) for i in trade_core.state()]) + os.linesep)
 
 
 def read_latest_trade_state(log_file_path: str):
@@ -34,14 +34,15 @@ def create_project(
     trade_core_name = trade_core.__class__.__name__
     trade_core_params = trade_core.collect_init_paras()["params"]
     with open(os.path.join(project_dir, "config.yaml"), "w") as f:
-        yaml.safe_dump(
-            {
+        config={
                 "trade_code": {"target": trade_core_name, "params": trade_core_params},
                 "start_index": start_index,
                 "end_index": end_index,
                 "current_index": current_index,
                 "start_trade_index": start_trade_index,
-            },
+            }
+        yaml.safe_dump(
+            config,
             f,
         )
 
