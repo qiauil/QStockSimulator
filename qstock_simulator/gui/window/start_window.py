@@ -1,6 +1,7 @@
 from qfluentwidgets import FluentWindow, BodyLabel, FluentIcon,NavigationItemPosition
 from ...libs.style import Icon
-from ..widget.data_selector import DataSelector
+from ..view.data_selector import DataSelector
+from ..view.project_loader import ProjectLoader
 from .window_basics import ProgressiveMixin
 
 class StartWindow(FluentWindow,ProgressiveMixin):
@@ -10,6 +11,9 @@ class StartWindow(FluentWindow,ProgressiveMixin):
         self.setFixedSize(550, 650)
         self.setResizeEnabled(False)
         self.titleBar.maxBtn.hide()
+        self.navigationInterface.setReturnButtonVisible(False)
+        self.navigationInterface.setExpandWidth(200)
+        self.navigationInterface.setAcrylicEnabled(True)
 
         data_selector = DataSelector(parent=self,parent_window=self)
         data_selector.setObjectName("data_selector")
@@ -19,21 +23,20 @@ class StartWindow(FluentWindow,ProgressiveMixin):
             text="New Project",
             isTransparent=True
         )
-        label_2=BodyLabel(
-            "Welcome to Stock Simulator",
-            parent=self
-        )
-        label_2.setObjectName("title2")
+        project_loader = ProjectLoader(parent=self,parent_window=self)
+        project_loader.setObjectName("project_loader")
         self.addSubInterface(
-            label_2,
+            project_loader,
             icon=Icon.OPEN,
-            text="Open",
+            text="Load Project",
+            isTransparent=True
         )
         label_3=BodyLabel(
             "Welcome to Stock Simulator",
             parent=self
         )
         label_3.setObjectName("title3")
+        self.navigationInterface.addSeparator(position=NavigationItemPosition.BOTTOM)
         self.addSubInterface(
             label_3,
             icon=FluentIcon.SETTING,

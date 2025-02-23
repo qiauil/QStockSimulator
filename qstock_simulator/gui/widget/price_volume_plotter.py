@@ -13,8 +13,9 @@ from typing import Optional
 
 class PriceVolumePlotter(QWidget):
 
-    def __init__(self, parent=None):
+    def __init__(self, name=None,parent=None):
         super().__init__(parent)
+        self.name = name if name is not None else "PriceVolumePlotter"
         self.main_layout = QVBoxLayout(self)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(8)
@@ -37,16 +38,31 @@ class PriceVolumePlotter(QWidget):
         self.main_layout.addWidget(self.price_card,stretch=3)
         self.main_layout.addWidget(self.volume_card,stretch=1)
 
-        self.price_plotter.main_plotter.sigViewChanged.connect(
-            lambda: self.__on_view_changed(self.price_plotter.main_plotter)
-        )
-        self.volume_plotter.main_plotter.sigViewChanged.connect(
-            lambda: self.__on_view_changed(self.volume_plotter.main_plotter)
-        )
-
+        #self.price_plotter.main_plotter.sigViewChanged.connect(
+        #    lambda: self.__on_view_changed(self.price_plotter.main_plotter)
+        #)
+        #self.volume_plotter.main_plotter.sigViewChanged.connect(
+        #    lambda: self.__on_view_changed(self.volume_plotter.main_plotter)
+        #)
+        self.first_showed = True
         set_background_with_theme(self)
 
         qconfig.themeChanged.connect(lambda theme: set_background_with_theme(self, theme))
+    
+    def showEvent(self, a0):
+        if self.first_showed:
+            self.volume_plotter.update_plot(
+                        x_loc=self.price_plotter.main_plotter.viewRect().left(),
+                        x_range=self.price_plotter.main_plotter.viewRect().width(),
+                    )
+            self.price_plotter.main_plotter.sigViewChanged.connect(
+                lambda: self.__on_view_changed(self.price_plotter.main_plotter)
+            )
+            self.volume_plotter.main_plotter.sigViewChanged.connect(
+                lambda: self.__on_view_changed(self.volume_plotter.main_plotter)
+            )
+            self.first_showed = False
+        return super().showEvent(a0)
 
     def __on_view_changed(self, active_plot_widget):
         if active_plot_widget == self.price_plotter.main_plotter:
@@ -54,12 +70,12 @@ class PriceVolumePlotter(QWidget):
                 x_loc=active_plot_widget.viewRect().left(),
                 x_range=active_plot_widget.viewRect().width(),
             )
-        else:
+        elif active_plot_widget == self.volume_plotter.main_plotter:
             self.price_plotter.update_plot(
                 x_loc=active_plot_widget.viewRect().left(),
                 x_range=active_plot_widget.viewRect().width(),
             )
-
+    
     def plot_price_volume(
         self, price_data: PricesDataFrame, 
         volume_data: VolumeDataFrame
@@ -84,11 +100,12 @@ class PriceVolumePlotter(QWidget):
     
     def move_to_start(self):
         self.price_plotter.move_to_start()
+        
 
 class PriceVolumeInfoPlotter(PriceVolumePlotter):
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, name=None,parent=None):
+        super().__init__(name=name,parent=parent)
         self.info_bar = StockInfoBar()
         self.main_layout.addWidget(self.info_bar)
 
@@ -132,7 +149,7 @@ class DWMPriceVolumePlotter(QWidget):
                      day_data:TradeData
                      ):
         if self.day_plotter is None:
-            self.day_plotter = self._create_plotter(parent=self.data_navigation_widget)
+            self.day_plotter = self._create_plotter(parent=self.data_navigation_widget,name="day_plotter")
             self.day_plotter.price_plotter.set_full_range_enabled(False)
             self.day_plotter.volume_plotter.set_full_range_enabled(False)
             self.data_navigation_widget.addSubInterface(
@@ -146,7 +163,7 @@ class DWMPriceVolumePlotter(QWidget):
                       week_data: TradeData,
                       ):
         if self.week_plotter is None:
-            self.week_plotter = self._create_plotter(parent=self.data_navigation_widget)
+            self.week_plotter = self._create_plotter(parent=self.data_navigation_widget,name="week_plotter")
             self.week_plotter.price_plotter.set_full_range_enabled(False)
             self.week_plotter.volume_plotter.set_full_range_enabled(False)
             self.data_navigation_widget.addSubInterface(
@@ -160,7 +177,7 @@ class DWMPriceVolumePlotter(QWidget):
                        month_data: TradeData,
                           ):
         if self.month_plotter is None:
-            self.month_plotter = self._create_plotter(parent=self.data_navigation_widget)
+            self.month_plotter = self._create_plotter(parent=self.data_navigation_widget,name="month_plotter")
             self.month_plotter.price_plotter.set_full_range_enabled(False)
             self.month_plotter.volume_plotter.set_full_range_enabled(False)
             self.data_navigation_widget.addSubInterface(

@@ -77,7 +77,6 @@ class BasicInfoComponent:
         self.widget.add_data_handler(data_handler)
         if self._first_initilized:
             self._avoid_out_of_range()
-
         start_day = pd.to_datetime(self.day_data.prices.x_ticks[start_index])
         end_day = pd.to_datetime(self.day_data.prices.x_ticks[current_index])
 

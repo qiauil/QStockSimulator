@@ -1,13 +1,18 @@
-from .window_basics import  TitleMenuWindow
+from .window_basics import  TitleMenuWindow, SplashWindow
 from qfluentwidgets import InfoBar, InfoBarPosition, FluentIcon, Action
 from ..widget.control_pannel import ControlPannel
 from ..widget.pips_pager_navigation import PipsPagerNavigation
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QSizePolicy
+from PyQt6.QtWidgets import QSizePolicy, QApplication
 
 class TradeWindow(TitleMenuWindow):
-    def __init__(self, parent=None):
+    def __init__(self, 
+                 show_loading:bool=True,
+                 parent=None):
         super().__init__(parent=parent,main_lyout_direction="vertical")
+        if show_loading:
+            self.loading_window=SplashWindow(self.windowIcon())
+            #self.loading_window.show()
         #self.main_layout.addWidget(SubtitleLabel("Stock Info",parent=self))
         self.stock_info_navigation = PipsPagerNavigation(parent=self)
         self.stock_info_navigation.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
@@ -30,6 +35,17 @@ class TradeWindow(TitleMenuWindow):
                 self.state_info_action.setIcon(FluentIcon.VIEW)    
         self.state_info_action.triggered.connect(state_info_action_triggered)
         self.menu.addAction(self.state_info_action)
+
+        self.first_showed=True
+
+
+    def showEvent(self, a0):
+        re = super().showEvent(a0)
+        if self.first_showed:
+            if hasattr(self,"loading_window"):
+                self.loading_window.close()
+            self.first_showed=False
+        return re
 
     def show_success_info(self,title:str,content:str):
         InfoBar.success(

@@ -25,13 +25,13 @@ from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import QSizePolicy,QHBoxLayout, QVBoxLayout, QWidget, QStackedWidget, QListWidgetItem, QBoxLayout
 from typing import Sequence
 import random
-from .progress_message_box import ProgressMessageBox
+from ..widget.progress_message_box import ProgressMessageBox
 from ...libs.data.provider import BaoStockDataProviderGUISetup
 from ...libs.trade_core import ChineseStockMarketTradeCoreGUISetup
 from ...libs.io import create_project
 from ...apps.main_trade import MainTrade
 from ...libs.style import Icon
-from .cards import FolderSelectCard, ExpandWidgetCard, TransparentWidgetCard, WidgetCard
+from ..widget.cards import FolderSelectCard, ExpandWidgetCard, TransparentWidgetCard, WidgetCard
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import pyqtSignal
 import random,os
@@ -88,19 +88,6 @@ class _BasicFrame(QWidget):
         "scroll is only avaliable when all the wigets are added"
         self._scroller.setWidget(self._scroller_widget)
         self._scroller.setWidgetResizable(True)
-
-    def add_header_card(self, 
-                        title:str,
-                        widget:QWidget=None,
-                        layout:QBoxLayout=None):
-        card = HeaderCardWidget(title=title,parent=self)
-        self.content_layout.addWidget(card)
-        if widget is not None:
-            card.viewLayout.addWidget(widget)
-        if layout is not None:
-            #layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-            card.viewLayout.addLayout(layout)
-        return card
 
     @property
     def next_clicked(self):
@@ -312,41 +299,6 @@ class ConfigTradeFrame(_BasicFrame):
         trade_rule_card.setExpand(True)
         self.initial_amount_input.setFixedWidth(150)
 
-        #trade_simulation_length_layout = QVBoxLayout()
-        #simulation_length_label=BodyLabel("Trade Simulation Length: 0")
-        #trade_simulation_length_layout.addWidget(simulation_length_label)
-        #self.simulation_length_slider = Slider(Qt.Orientation.Horizontal,parent=self)
-        #self.simulation_length_slider.setRange(1,100)
-        #self.simulation_length_slider.valueChanged.connect(lambda value: simulation_length_label.setText(f"Trade Simulation Length: {value}"))
-        #trade_simulation_length_layout.addWidget(self.simulation_length_slider)
-        #self.add_header_card("Trade Configuration",layout=trade_simulation_length_layout)
-
-        #self.trade_core_selector = ComboBox(parent=self)
-        #self.add_header_card("Select Trade Rule",widget=self.trade_core_selector)
-        #trade_core_para_layout = QVBoxLayout()
-        #trade_core_para_layout.setSpacing(0)
-        #initial_amount_layout = QHBoxLayout()
-        #initial_amount_layout.setContentsMargins(10,0,10,0)
-        #initial_amount_label=BodyLabel("Initial avaliable money:")
-        #initial_amount_label.setMinimumWidth(100)
-        #initial_amount_layout.addWidget(initial_amount_label)
-        #self.initial_amount_input = SpinBox(parent=self)
-        #self.initial_amount_input.setRange(0,100000000)
-        #self.initial_amount_input.setValue(1000)
-        #self.initial_amount_input.setFixedWidth(150)
-        #initial_amount_layout.addWidget(self.initial_amount_input)
-        #initial_amount_layout.addWidget(BodyLabel("· intial stock price"))
-        #trade_core_para_layout.addLayout(initial_amount_layout)
-        #self.trade_core_para_stacker = QStackedWidget(self)
-        #trade_core_para_layout.addWidget(self.trade_core_para_stacker)
-        #self.add_header_card("Trade Rule Parameters",layout=trade_core_para_layout)
-        #for trade_core in self.trade_cores:
-        #    self.trade_core_para_stacker.addWidget(trade_core._init_widget(self))
-        #    self.trade_core_selector.addItem(trade_core.name)
-        #    self.trade_core_selector.currentIndexChanged.connect(
-        #        self.trade_core_para_stacker.setCurrentIndex
-        #    )
-
     def set_length(self,length:int):
         self.simulation_length_slider.setRange(1,length)
         self.simulation_length_slider.setValue(int(length*0.2))
@@ -468,7 +420,6 @@ class DataSelector(QWidget):
                            trade_core,
                            start_index=0,
                            end_index=end_index,
-                           current_index=start_trade_index,
                            start_trade_index=start_trade_index)
         if self.parent_window is not None:
             self.parent_window.hide()
@@ -476,7 +427,6 @@ class DataSelector(QWidget):
             self.hide()
         window = MainTrade(data_handler=self.data_handler,
                            start_index=0,
-                           current_index=start_trade_index,
                            end_index=end_index,
                            trade_core=trade_core,
                            start_trade_index=start_trade_index,

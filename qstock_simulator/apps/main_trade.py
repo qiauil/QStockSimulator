@@ -14,20 +14,31 @@ class MainTrade(TradeWindow):
         data_handler: DataHandler,
         start_index: int,
         end_index: int,
-        current_index: int,
+        start_trade_index: int,
         trade_core: TradeCore,
-        start_trade_index: Optional[int] = None,
         log_file_path: Optional[str] = None,
+        show_loading: bool = True,
         parent=None,
-    ):
-        super().__init__(parent=parent)
+    ):  
+        super().__init__(show_loading=show_loading,parent=parent)
         # initialze main data
         self.start_index = start_index
         self.end_index = end_index
-        self.current_index = current_index
-        self.start_trade_index = (
-            start_trade_index if start_trade_index is not None else current_index
-        )
+        self.start_trade_index = start_trade_index
+
+        self.log_file_path=log_file_path
+        if self.log_file_path is not None:
+            if not os.path.isdir(self.log_file_path):
+                raise ValueError("Invalid log file path")
+            if not os.path.exists(self.log_file_path):
+                os.makedirs(self.log_file_path)
+            indicies,avaliable,current,invested,invested_stock,handling_fee_total=self._read_state_log()
+            self.setWindowTitle(f"Stock Simulator - {os.path.basename(self.log_file_path)}")
+        else:
+            indicies = avaliable = current = invested = invested_stock= handling_fee_total = []
+            self.setWindowTitle(f"Stock Simulator")
+        self.current_index = start_trade_index+len(indicies)
+
         self.day_data = data_handler.day_data
         if self.end_index >= len(data_handler.day_data.prices):
             raise ValueError("End index is out of range")
@@ -45,7 +56,7 @@ class MainTrade(TradeWindow):
                 )
         for component in self.components:
             if hasattr(component, "initialze"):
-                component.initialze(data_handler, start_index, current_index)
+                component.initialze(data_handler, start_index, self.current_index)
         # initialize widgets
         ticks = {}
         index = 0
@@ -65,9 +76,6 @@ class MainTrade(TradeWindow):
         )
         # set up trade core
         self.trade_core = trade_core
-        t, initial, close, high, low = self.day_data.prices[self.current_index]
-        self.trade_core.current_price = close
-        self._update_info_table()
         # connect signals
         self.control_pannel.control_command_bar.next_day_action.triggered.connect(
             self.on_move_next_day
@@ -85,18 +93,25 @@ class MainTrade(TradeWindow):
             self.on_sell_amount_changed
         )
         # trade plot update from log file
-        self.log_file_path=log_file_path
-        if self.log_file_path is None or not os.path.isdir(self.log_file_path):
-            self._update_trade_plot()
+        if len(indicies) > 0:
+            # update trade core according to log file
+            self.trade_core.load_state(
+                [state[-1] for state in [avaliable,current,invested,invested_stock,handling_fee_total]]
+            )
+            # update trade plot according to log file
+            self.control_pannel.set_invested_money_plot(indicies,invested)
+            self.control_pannel.set_avaliable_money_plot(indicies,avaliable)
+            self.control_pannel.set_current_money_plot(indicies,[avaliable[i]+invested[i] for i in range(len(avaliable))])
+            self.control_pannel.profit_plot.full_range()
         else:
-            if not os.path.exists(self.log_file_path):
-                os.makedirs(self.log_file_path)
-            state_log_valid, state_log_not_empty = self._read_state_log()
-            if state_log_valid:
-                if not state_log_not_empty:
-                    self._update_trade_plot()
-            else:
-                self.show_error_info(title="Invalid log file",content="Invalid state log file")
+            # update trade core according to initial setting
+            t, initial, close, high, low = self.day_data.prices[self.current_index]
+            self.trade_core.current_price = close
+            # update trade plot only with the trade core
+            self._update_trade_plot()
+        # update trade info table according to trade core
+        self._update_info_table()
+        if self.log_file_path is not None:
             self._read_action_log()
         # other settings
         if self.current_index == self.end_index:
@@ -114,31 +129,24 @@ class MainTrade(TradeWindow):
             return None
         return os.path.join(self.log_file_path,"action.log")
 
-
-    def _read_state_log(self,log_file_path:str=None):
-        log_file_path = log_file_path if log_file_path is not None else self.trade_state_log_path
-        current=[];invested=[];avaliable=[]
-        try:
-            if not os.path.exists(log_file_path):
-                with open(log_file_path,"w") as f:
-                    f.write("#avaliable_money,current_price,invested_money,invested_stock,handling_fee_total\n")
-                return True,False
-            with open(log_file_path,"r") as f:
-                lines = f.readlines()
-            for line in lines:
-                if not line.startswith("#"):
-                    line = line.strip().split(",")
-                    avaliable.append(float(line[0]))
-                    current.append(float(line[1]))
-                    invested.append(float(line[2])) 
-            if len(current) == 0:
-                return True,False
-            self.control_pannel.set_current_money_plot(current)
-            self.control_pannel.set_invested_money_plot(invested)
-            self.control_pannel.set_avaliable_money_plot(avaliable)
-            return True,True
-        except Exception as e:
-            return False,False
+    def _read_state_log(self):
+        log_file_path=self.trade_state_log_path
+        current=[];invested=[];avaliable=[];invested_stock=[];handling_fee_total=[]
+        if not os.path.exists(log_file_path):
+            with open(log_file_path,"w") as f:
+                f.write("#avaliable_money,current_price,invested_money,invested_stock,handling_fee_total\n")
+            return list(range(len(current))),avaliable,current,invested,invested_stock,handling_fee_total
+        with open(log_file_path,"r") as f:
+            lines = f.readlines()
+        for line in lines:
+            if not line.startswith("#") and len(line.strip())>0:
+                line = line.strip().split(",")
+                avaliable.append(float(line[0]))
+                current.append(float(line[1]))
+                invested.append(float(line[2])) 
+                invested_stock.append(float(line[3]))
+                handling_fee_total.append(float(line[4]))
+        return list(range(len(current))),avaliable,current,invested,invested_stock,handling_fee_total
         
     def _write_state_log(self,
                          log_file_path:str=None):

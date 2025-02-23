@@ -16,7 +16,7 @@ trade_core = ChineseStockMarketTradeCore(avaliable_money=1000000)
 window = MainTrade(
     data_handler=data_handler,
     start_index=5,
-    current_index=10,
+    start_trade_index=10,
     end_index=100,
     trade_core=trade_core
 )

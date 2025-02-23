@@ -2,12 +2,31 @@ from ..widget.progress_message_box import ProgressMessageBox
 from ...libs.utils import FunctionThread
 from qfluentwidgets.components.widgets.frameless_window import FramelessWindow
 from qfluentwidgets.common.animation import BackgroundAnimationWidget
-from qfluentwidgets import isDarkTheme, qconfig, FluentTitleBar, TransparentToolButton, FluentIcon, RoundMenu, MenuAnimationType, Action, setTheme, Theme, CheckableMenu, MenuIndicatorType
+from qfluentwidgets import isDarkTheme, qconfig, FluentTitleBar, TransparentToolButton, FluentIcon, RoundMenu, MenuAnimationType, Action, setTheme, Theme, CheckableMenu, MenuIndicatorType,SplashScreen
 from PyQt6.QtWidgets import QHBoxLayout,QVBoxLayout
 from PyQt6.QtGui import QColor,QIcon,QPainter
-from PyQt6.QtCore import Qt,pyqtSignal, QThread
+from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtWidgets import QApplication,QWidget
 from typing import Literal
 import sys
+
+class SplashWindow(BackgroundAnimationWidget,FramelessWindow):
+
+    def __init__(self, 
+                 icon: QIcon, 
+                 icon_size:int=128,
+                 parent=None):
+        super().__init__(parent=parent)
+        self.titleBar.hide()
+        self.splash_screen = SplashScreen(icon,parent=self)
+        self.splash_screen.setIconSize(QSize(icon_size, icon_size))
+        self.splash_screen.titleBar.hide()
+        self.splash_screen.raise_()
+        desktop = QApplication.screens()[0].availableGeometry()
+        w, h = desktop.width(), desktop.height()
+        self.move(w//2 - self.width()//2, h//2 - self.height()//2)
+        self.show()
+        QApplication.processEvents()
 
 class DefaultWindow(BackgroundAnimationWidget,FramelessWindow):
     def __init__(self, parent=None, main_lyout_direction: Literal["horizontal", "vertical"] = "horizontal"):

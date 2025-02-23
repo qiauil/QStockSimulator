@@ -40,8 +40,8 @@ class TradeCore(InitParaRecorder):
             }
         else:
             return [self.avaliable_money,self.current_price,self.invested_money,self.invested_stock,self.handling_fee_total]
-        
-    def load_state(self,state:Union[dict,Sequence]):
+
+    def _apply_state(self,state:Union[dict,Sequence]):
         if isinstance(state,dict):
             self.avaliable_money = state["avaliable_money"]
             self.current_price = state["current_price"]
@@ -54,6 +54,14 @@ class TradeCore(InitParaRecorder):
             self.invested_money = state[2]
             self.invested_stock = state[3]
             self.handling_fee_total = state[4]
+
+    def load_state(self,state:Union[dict,Sequence]):
+        if isinstance(state,dict):
+            current_state=self.state(return_dict=True)
+            current_state.update(state)
+            self._apply_state(current_state)
+        else:
+            self._apply_state(state)
 
     def move_to_next_day(self,next_day_price:float):
         self.current_price = next_day_price
@@ -76,12 +84,9 @@ class TradeCore(InitParaRecorder):
                 state=BuyState.SUCCESS
             self.invested_stock += num_stock
             handle_fee = self.handling_fee_buy(num_stock)
-            print(f"handle_fee:{handle_fee}")
             self.handling_fee_total += handle_fee
             new_invested=num_stock * self.current_price
-            print(f"new_invested:{new_invested}")
             self.avaliable_money -= (new_invested + handle_fee)
-            print(f"avaliable_money:{self.avaliable_money}")
             self.invested_money += new_invested
             return state,new_invested
         return BuyState.NOT_ALLOWED_AMOUNT,0.0
