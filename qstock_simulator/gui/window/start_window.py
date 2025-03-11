@@ -1,6 +1,6 @@
 from qfluentwidgets import FluentWindow, BodyLabel, FluentIcon,NavigationItemPosition
 from ...libs.style import Icon
-from ..view.data_selector import DataSelector
+from ..view.project_creator import DataCreator
 from ..view.project_loader import ProjectLoader
 from .window_basics import ProgressiveMixin
 
@@ -8,14 +8,14 @@ class StartWindow(FluentWindow,ProgressiveMixin):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFixedSize(550, 650)
+        self.setFixedSize(650, 650)
         self.setResizeEnabled(False)
         self.titleBar.maxBtn.hide()
         self.navigationInterface.setReturnButtonVisible(False)
         self.navigationInterface.setExpandWidth(200)
         self.navigationInterface.setAcrylicEnabled(True)
 
-        data_selector = DataSelector(parent=self,parent_window=self)
+        data_selector = DataCreator(parent=self,parent_window=self)
         data_selector.setObjectName("data_selector")
         self.addSubInterface(
             data_selector,

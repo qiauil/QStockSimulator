@@ -37,86 +37,24 @@ from PyQt6.QtCore import pyqtSignal
 import random,os
 from typing import Optional
 
-class _BasicFrame(QWidget):
+from ..widget.scroller_settings import ScrollerSettings
 
-    def __init__(
-        self,
-        parent=None,
-        next_button_text: str = "Next",
-        back_button_text: str = "Back",
-        show_back_button: bool = True,
-    ):
-        super().__init__(parent)
-        self.main_layout = QVBoxLayout(self)
-        self.main_layout.setSpacing(10)
-        self.main_layout.setContentsMargins(0,0,0,0)
-
-        self._scroller=ScrollArea(parent=parent)
-        self._scroller.setStyleSheet("background:transparent;border: none;")
-        self._scroller_widget = QWidget(parent=self)
-        self.content_layout = QVBoxLayout(self._scroller_widget)
-        self.content_layout.setSpacing(0)
-        self.content_layout.setContentsMargins(0,0,15,0)
-        self.content_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.main_layout.addWidget(self._scroller)
-
-        self.control_layout = QHBoxLayout()
-        self.back_button = PushButton(back_button_text, parent=self)
-        self.back_button.setMaximumWidth(100)
-        self.next_button = PrimaryPushButton(next_button_text, parent=self)
-        self.next_button.setMaximumWidth(100)
-        self.next_button.setFocus()
-        self.control_layout.addWidget(self.back_button, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.control_layout.addSpacing(50)
-        self.control_layout.addWidget(self.next_button, alignment=Qt.AlignmentFlag.AlignRight)
-        self.control_layout.setContentsMargins(0,0,15,0)
-        self.main_layout.addLayout(self.control_layout)
-        self.main_layout.addSpacing(10)
-        if not show_back_button:
-            self.back_button.hide()
-
-        self.n_title = 0
-        
-        self._init_widget()
-        self._enable_scroll()
-        
-
-    def _init_widget(self):
-        raise NotImplementedError("This method should be implemented in subclass")
-
-    def _enable_scroll(self):
-        "scroll is only avaliable when all the wigets are added"
-        self._scroller.setWidget(self._scroller_widget)
-        self._scroller.setWidgetResizable(True)
-
-    @property
-    def next_clicked(self):
-        return self.next_button.clicked
     
-    @property
-    def back_clicked(self):
-        return self.back_button.clicked
-    
-class DataProviderInItFrame(_BasicFrame):
+class DataProviderInItFrame(ScrollerSettings):
 
-    def __init__(self, data_provider_setups:Sequence[DataProviderGUISetup],parent=None):
+    def __init__(self, data_provider_setups:Sequence[DataProviderGUISetup],
+                 parent=None):
         self.data_provider_setups = data_provider_setups
-        super().__init__(parent=parent, show_back_button=False)
-
+        super().__init__("New Project", show_control=True, 
+                         next_button_text="Next", 
+                         show_back_button=False, parent=parent)
+        
     def _init_widget(self):
-        project_folder_group = SettingCardGroup(
-            "Project Location",
-            parent=self._scroller_widget)
-        self.content_layout.addWidget(project_folder_group,alignment=Qt.AlignmentFlag.AlignTop)
+        project_folder_group = self.add_setting_card_group("Project Location")
         self.project_folder_card = FolderSelectCard(parent=project_folder_group,empty_folder_content="No folder selected, will not save the project")
         project_folder_group.addSettingCard(self.project_folder_card)
 
-        self.content_layout.addSpacing(20)
-
-        provider_group = SettingCardGroup(
-            "Data Provider",
-            parent=self._scroller_widget)
-        self.content_layout.addWidget(provider_group, alignment=Qt.AlignmentFlag.AlignTop)
+        provider_group = self.add_setting_card_group("Data Provider")
         combo_box_card = ExpandWidgetCard(
             icon=Icon.DATA,
             title="Data Provider",
@@ -156,24 +94,22 @@ class DataProviderInItFrame(_BasicFrame):
             self._current_provider.on_exit()
             self._current_provider = None
 
-class StockSelectorFrame(_BasicFrame):
-    def __init__(self,parent=None):
-        super().__init__(parent=parent)   
-    
+class StockSelectorFrame(ScrollerSettings):
+
+    def __init__(self, parent=None):
+        super().__init__(title="New Project", 
+                         show_control=True, parent=parent,)
+
     def _init_widget(self):
         self._stock_list=None
-        stock_select_setting_groups=SettingCardGroup(
-            "Select Stock",
-            parent=self._scroller_widget
-        )
-        self.content_layout.addWidget(stock_select_setting_groups)
+        stock_select_setting_group=self.add_setting_card_group("Select Stock")
         self.current_stock_card=ExpandWidgetCard(
             icon=Icon.NUMBER,
             title="Current Stock",
             content="The stock that will be used for trade",
-            parent=stock_select_setting_groups
+            parent=stock_select_setting_group
         )
-        stock_select_setting_groups.addSettingCard(self.current_stock_card)
+        stock_select_setting_group.addSettingCard(self.current_stock_card)
         self.current_stock_card.setExpand(True)
         self.current_stock_label = BodyLabel("None")
         self.current_stock_card.add_widget(self.current_stock_label)
@@ -205,7 +141,6 @@ class StockSelectorFrame(_BasicFrame):
         stock_list_parent_layout.addWidget(self.stock_list_widget)
         stock_list_parent_layout.setContentsMargins(0,0,10,0)
         self.current_stock_card.add_content_widget(stock_list_parent_widget)
-
 
     @property
     def stock_list(self):
@@ -241,20 +176,15 @@ class StockSelectorFrame(_BasicFrame):
     def current_stock(self):
         return self.current_stock_label.text()
 
-class ConfigTradeFrame(_BasicFrame):
-    def __init__(self,
-                 trade_cores:Sequence[TradeCoreGUISetup],
-                 parent=None):
+
+class ConfigTradeFrame(ScrollerSettings):
+    def __init__(self, trade_cores:Sequence[TradeCoreGUISetup], parent=None):
         self.trade_cores=trade_cores
-        super().__init__(parent=parent,
-                         next_button_text="Start Trade")  
+        super().__init__(title="New Project", 
+                         next_button_text="Start Trade",parent=parent)
 
     def _init_widget(self):
-        simulation_config_group = SettingCardGroup(
-            "Simulation Configuration",
-            parent=self._scroller_widget
-        )
-        self.content_layout.addWidget(simulation_config_group)
+        simulation_config_group = self.add_setting_card_group("Simulation Configuration")
         simulation_length_card = WidgetCard(
             icon=Icon.RULER,
             title="Simulation Length",
@@ -321,7 +251,7 @@ class ConfigTradeFrame(_BasicFrame):
         return self.initial_amount_input.value()
     
 
-class DataSelector(QWidget):
+class DataCreator(QWidget):
 
     sigShowError = pyqtSignal(str, str)
 
@@ -334,9 +264,9 @@ class DataSelector(QWidget):
         super().__init__(parent)
         self.parent_window = parent_window
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(10,0,0,0)
-        self.main_layout.addWidget(TitleLabel("New Project", parent=self))
-        self.main_layout.addSpacing(10)
+        #self.main_layout.setContentsMargins(10,0,0,0)
+        #self.main_layout.addWidget(TitleLabel("New Project", parent=self))
+        #self.main_layout.addSpacing(10)
         self.stacked_widget = QStackedWidget(self)
         FluentStyleSheet.FLUENT_WINDOW.apply(self.stacked_widget)
         self.main_layout.addWidget(self.stacked_widget)
