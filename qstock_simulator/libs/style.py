@@ -9,7 +9,6 @@ import os
 file_path = os.path.realpath(__file__)
 resource_path=os.path.abspath(os.path.join(file_path,os.pardir,os.pardir,"resources"))
 QtCore.QDir.addSearchPath('icons', os.path.join(resource_path,"icon")+os.sep)
-print(os.path.join(resource_path,"icon"))
 
 def default_style_configs() -> ConfigurationsHandler:
     handler=style.default_style_configs()

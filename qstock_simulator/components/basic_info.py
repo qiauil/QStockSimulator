@@ -6,9 +6,10 @@ import pandas as pd
 import pyqtgraph as pg
 from pyqtgraph import PlotCurveItem
 from qfluentwidgets import Action, FluentIcon
+from PyQt6.QtCore import QObject
 
 
-class BasicInfoComponent:
+class BasicInfoComponent(QObject):
 
     def __init__(self, widget_parent=None, **kwargs):
         self.widget = DWMPriceVolumeInfoPlotter(widget_parent)
@@ -27,7 +28,7 @@ class BasicInfoComponent:
         else:
             self.style = make_style()
         # initialize menus
-        self.hide_info_action = Action("Stock info bar", parent=widget_parent)
+        self.hide_info_action = Action(self.tr("Stock info bar"), parent=widget_parent)
         self.hide_info_action.setIcon(FluentIcon.VIEW)
         def hide_info_action_triggered():
             if self.widget.day_plotter.info_bar.isVisible():
@@ -37,7 +38,7 @@ class BasicInfoComponent:
                 self.widget.set_info_bar_visible(True)
                 self.hide_info_action.setIcon(FluentIcon.VIEW)
         self.hide_info_action.triggered.connect(hide_info_action_triggered)
-        self.hide_volume_action = Action("Volume plot", parent=widget_parent)
+        self.hide_volume_action = Action(self.tr("Volume plot"), parent=widget_parent)
         self.hide_volume_action.setIcon(FluentIcon.VIEW)
         def hide_volume_action_triggered():
             if self.widget.day_plotter.volume_plotter.isVisible():
@@ -182,7 +183,7 @@ class BasicInfoComponent:
                         self._month_end_index += 1
                         self._move_month_view()
         else:
-            raise ValueError("End of day data")
+            raise ValueError(self.tr("End of day data"))
 
     def _move_day_view(self):
         self.widget.day_plotter.set_x_range(

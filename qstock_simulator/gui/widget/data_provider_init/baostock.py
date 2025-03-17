@@ -14,8 +14,8 @@ class BaoStockProviderInitGUI(QWidget):
 
         start_date_card = TransparentWidgetCard(
             FluentIcon.CALENDAR,
-            "Start Date",
-            "Search avaliable stock data from this date",
+            self.tr("Start Date"),
+            self.tr("Search avaliable stock data from this date"),
             parent=parent
         )
         self.start_date_picker = CalendarPicker(parent=start_date_card)
@@ -25,8 +25,8 @@ class BaoStockProviderInitGUI(QWidget):
 
         end_date_card = TransparentWidgetCard(
             FluentIcon.CALENDAR,
-            "End Date",
-            "Search avaliable stock data until this date",
+            self.tr("End Date"),
+            self.tr("Search avaliable stock data until this date"),
             parent=parent
         )
         self.end_date_picker = CalendarPicker(parent=end_date_card)

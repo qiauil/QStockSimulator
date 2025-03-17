@@ -8,6 +8,7 @@ from qstock_plotter import QStockPlotter
 from qstock_plotter.libs.plot_item import CandlestickPricesItem,CandlestickVolumeItem
 from qstock_plotter.libs.data_handler import PricesDataFrame, VolumeDataFrame
 from .stock_info_bar import StockInfoBar
+from ...libs.config import cfg
 
 from typing import Optional
 
@@ -153,7 +154,7 @@ class DWMPriceVolumePlotter(QWidget):
             self.day_plotter.price_plotter.set_full_range_enabled(False)
             self.day_plotter.volume_plotter.set_full_range_enabled(False)
             self.data_navigation_widget.addSubInterface(
-                self.day_plotter, "Day_plotter", "Day"
+                self.day_plotter, "Day_plotter", self.tr("Day")
             )
             self.day_plotter.price_card.setVisible(self._price_plotter_visible)
             self.day_plotter.volume_card.setVisible(self._volume_plotter_visible)
@@ -167,7 +168,7 @@ class DWMPriceVolumePlotter(QWidget):
             self.week_plotter.price_plotter.set_full_range_enabled(False)
             self.week_plotter.volume_plotter.set_full_range_enabled(False)
             self.data_navigation_widget.addSubInterface(
-                self.week_plotter, "Week_plotter", "Week"
+                self.week_plotter, "Week_plotter", self.tr("Week")
             )
             self.week_plotter.price_card.setVisible(self._price_plotter_visible)
             self.week_plotter.volume_card.setVisible(self._volume_plotter_visible)
@@ -181,7 +182,7 @@ class DWMPriceVolumePlotter(QWidget):
             self.month_plotter.price_plotter.set_full_range_enabled(False)
             self.month_plotter.volume_plotter.set_full_range_enabled(False)
             self.data_navigation_widget.addSubInterface(
-                self.month_plotter, "Month_plotter", "Month"
+                self.month_plotter, "Month_plotter", self.tr("Month")
             )
             self.month_plotter.price_card.setVisible(self._price_plotter_visible)
             self.month_plotter.volume_card.setVisible(self._volume_plotter_visible)

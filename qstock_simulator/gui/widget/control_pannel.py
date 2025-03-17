@@ -71,7 +71,7 @@ class ControlCommandBar(CommandBar):
         self.addWidget(self.buy_amount_box)
         self.buy_money_label = BodyLabel("0", parent=self)
         self.addWidget(self.buy_money_label)
-        self.buy_action = Action(FluentIcon.ADD, "Buy", parent=self)
+        self.buy_action = Action(FluentIcon.ADD, self.tr("Buy"), parent=self)
         self.addAction(self.buy_action)
         self.addSeparator()
 
@@ -84,11 +84,11 @@ class ControlCommandBar(CommandBar):
         self.sell_amount_box.setMaximum(100000)
         self.sell_amount_box.setValue(100)
         self.addWidget(self.sell_amount_box)
-        self.sell_action = Action(FluentIcon.REMOVE, "Sell", parent=self)
+        self.sell_action = Action(FluentIcon.REMOVE, self.tr("Sell"), parent=self)
         self.addAction(self.sell_action)
         self.addSeparator()
 
-        self.next_day_action = Action(FluentIcon.CHEVRON_RIGHT, "Next", parent=self)
+        self.next_day_action = Action(FluentIcon.CHEVRON_RIGHT, self.tr("Next"), parent=self)
         # self.next_day_action = Action('Next', parent=self)
         self.addAction(self.next_day_action)
         """
@@ -133,7 +133,7 @@ class TradeInfoTabel(QWidget):
         separate_label.setFixedSize(24, 1)
         self.main_layout.addWidget(separate_label)
         self.main_layout.addLayout(self.value_layout)
-        self.initial_amount_label = self._add_info("Initial money:", "0")
+        self.initial_amount_label = self._add_info(self.tr("Initial money:"), self.tr("0"))
         self.label_height = self.initial_amount_label.height()
 
         def get_temp_label():
@@ -150,27 +150,27 @@ class TradeInfoTabel(QWidget):
         self.initial_amount_button_layout = create_button_layout()
         self.color_button_layout.addLayout(self.initial_amount_button_layout)
 
-        self.available_amount_label = self._add_info("Avaliable money:", "0")
+        self.available_amount_label = self._add_info(self.tr("Avaliable money:"), self.tr("0"))
         self.avaliable_amount_button_layout = create_button_layout()
         self.color_button_layout.addLayout(self.avaliable_amount_button_layout)
 
-        self.invested_amount_label = self._add_info("Invested money:", "0")
+        self.invested_amount_label = self._add_info(self.tr("Invested money:"), self.tr("0"))
         self.invested_amount_button_layout = create_button_layout()
         self.color_button_layout.addLayout(self.invested_amount_button_layout)
 
-        self.invested_stock_label = self._add_info("Invested stock:", "0")
+        self.invested_stock_label = self._add_info(self.tr("Invested stock:"), self.tr("0"))
         self.invested_stock_button_layout = create_button_layout()
         self.color_button_layout.addLayout(self.invested_stock_button_layout)
 
-        self.current_amount_label = self._add_info("Current money:", "0")
+        self.current_amount_label = self._add_info(self.tr("Current money:"), self.tr("0"))
         self.current_money_button_layout = create_button_layout()
         self.color_button_layout.addLayout(self.current_money_button_layout)
 
-        self.cost_label = self._add_info("Cost:", "0")
+        self.cost_label = self._add_info(self.tr("Cost:"), self.tr("0"))
         self.cost_button_layout = create_button_layout()
         self.color_button_layout.addLayout(self.cost_button_layout)
 
-        self.profit_label = self._add_info("Profit:", "0")
+        self.profit_label = self._add_info(self.tr("Profit:"), self.tr("0"))
         self.profit_button_layout = create_button_layout()
         self.color_button_layout.addLayout(self.profit_button_layout)
 

@@ -29,19 +29,19 @@ class MainTrade(TradeWindow):
         self.log_file_path=log_file_path
         if self.log_file_path is not None:
             if not os.path.isdir(self.log_file_path):
-                raise ValueError("Invalid log file path")
+                raise ValueError(self.tr("Invalid log file path"))
             if not os.path.exists(self.log_file_path):
                 os.makedirs(self.log_file_path)
             indicies,avaliable,current,invested,invested_stock,handling_fee_total=self._read_state_log()
-            self.setWindowTitle(f"Stock Simulator - {os.path.basename(self.log_file_path)}")
+            self.setWindowTitle(self.tr("Stock Simulator")+f" - {os.path.basename(self.log_file_path)}")
         else:
             indicies = avaliable = current = invested = invested_stock= handling_fee_total = []
-            self.setWindowTitle(f"Stock Simulator")
+            self.setWindowTitle(self.tr("Stock Simulator"))
         self.current_index = start_trade_index+len(indicies)
 
         self.day_data = data_handler.day_data
         if self.end_index >= len(data_handler.day_data.prices):
-            raise ValueError("End index is out of range")
+            raise ValueError(self.tr("End index is out of range"))
         # initialize components
         self.basic_info_component = BasicInfoComponent(widget_parent=self)
         self.components = [
@@ -155,7 +155,7 @@ class MainTrade(TradeWindow):
             try:
                 save_trade_state(log_file_path,self.trade_core)
             except Exception as e:
-                self.show_error_info(title="Log error",content="Failed to write state log:{}".format(str(e)))
+                self.show_error_info(title=self.tr("Log error"),content=self.tr("Failed to write state log:")+" {}".format(str(e)))
 
         
     def _read_action_log(self,log_file_path:str=None):
@@ -175,18 +175,18 @@ class MainTrade(TradeWindow):
                     elif line[0] == "s":
                         self.basic_info_component.add_sell_line(int(line[1]))
         except Exception as e:
-            self.show_error_info(title="Invalid log file",content="Invalid action log file")
+            self.show_error_info(title=self.tr("Invalid log file"),content=self.tr("Invalid action log file"))
 
     def _write_action_log(self,action:str,day:int,log_file_path:str=None):
         log_file_path = log_file_path if log_file_path is not None else self.trade_action_log_path
         if log_file_path is not None:
             try:
                 if action not in ["b","s"]:
-                    self.show_error_info(title="Invalid action",content="Invalid action for log")
+                    self.show_error_info(title=self.tr("Invalid action"),content=self.tr("Invalid action for log"))
                 with open(log_file_path,"a") as f:
                     f.write(f"{action},{day}\n")
             except Exception as e:
-                self.show_error_info(title="Log error",content="Failed to write action log: {}".format(str(e)))
+                self.show_error_info(title=self.tr("Log error"),content=self.tr("Failed to write action log:")+" {}".format(str(e)))
 
     def _update_info_table(self):
         self.control_pannel.trade_info_table.update_info(
@@ -227,7 +227,7 @@ class MainTrade(TradeWindow):
             f"{self.current_index-self.start_trade_index}/{self.end_index-self.start_trade_index}"
         )
         for component in self.components:
-            if hasattr(component, "on_move_next_day"):
+            if hasattr(component, self.tr("on_move_next_day")):
                 component.on_move_next_day()
         if self.current_index == self.end_index:
             self.on_finish_simulation()
@@ -243,26 +243,26 @@ class MainTrade(TradeWindow):
         state, invested = self.trade_core.buy(num_stock)
         if state == BuyState.NOT_ENOUGH_MONEY:
             self.show_error_info(
-                title="Not enough money",
-                content="You don't have enough money to buy {} stocks".format(
+                title=self.tr("Not enough money"),
+                content=self.tr("You don't have enough money to buy")+" {} ".format(
                     num_stock
-                ),
+                )+self.tr("stocks"),
             )
         elif state == BuyState.NOT_ALLOWED_AMOUNT:
             self.show_error_info(
-                title="Not allowed amount",
-                content="You can't buy {} stocks".format(num_stock),
+                title=self.tr("Not allowed amount"),
+                content=self.tr("You can't buy")+" {} ".format(num_stock)+self.tr("stocks"),
             )
         else:
             if state == BuyState.BUY_MAXIMUM:
                 self.show_warning_info(
-                    title="Buy maximum",
-                    content="You can only buy {} stocks".format(num_stock),
+                    title=self.tr("Buy maximum"),
+                    content=self.tr("You can only buy")+" {} "+self.tr("stocks").format(num_stock),
                 )
             else:
                 self.show_success_info(
-                    title="Buy successfully",
-                    content="You have bought {} stocks with {:.2f}".format(
+                    title=self.tr("Buy successfully"),
+                    content=self.tr("You have bought")+" {} ".format(num_stock)+self.tr("stocks with")+" {:.2f}".format(
                         num_stock, invested
                     ),
                 )
@@ -277,8 +277,8 @@ class MainTrade(TradeWindow):
         if state == SellState.SUCCESS:
             self._update_trade_state()
             self.show_success_info(
-                title="Sell successfully",
-                content="You have sold {} stocks with {:.2f}".format(
+                title=self.tr("Sell successfully"),
+                content=self.tr("You have sold")+" {} ".format(num_stock)+self.tr("stocks with")+" {:.2f}".format(
                     num_stock, avaliable
                 ),
             )
@@ -286,7 +286,7 @@ class MainTrade(TradeWindow):
             self._write_action_log("s",self.current_index)
         else:
             self.show_error_info(
-                title="Sell failed", content="You don't have enough stocks to sell"
+                title=self.tr("Sell failed"), content=self.tr("You don't have enough stocks to sell")
             )
         self._move_to_next_day_widget()
 
@@ -302,8 +302,8 @@ class MainTrade(TradeWindow):
         current_value = self.control_pannel.control_command_bar.buy_amount_box.value()
         if not self.trade_core.is_avaliable_buy_amount(current_value):
             self.show_warning_info(
-                title="Unavaliable amount",
-                content="You can't buy {} stocks".format(current_value),
+                title=self.tr("Unavaliable amount"),
+                content=self.tr("You can't buy")+" {} ".format(current_value)+self.tr("stocks"),
             )
         self.control_pannel.control_command_bar.buy_money_label.setText(
             f"≈{self.trade_core.current_price*self.control_pannel.control_command_bar.buy_amount_box.value():.2f}"
@@ -313,6 +313,6 @@ class MainTrade(TradeWindow):
         current_value = self.control_pannel.control_command_bar.sell_amount_box.value()
         if not self.trade_core.is_avaliable_sell_amount(current_value):
             self.show_warning_info(
-                title="Unavaliable amount",
-                content="You can't sell {} stocks".format(current_value),
+                title=self.tr("Unavaliable amount"),
+                content=self.tr("You can't sell")+" {} ".format(current_value)+self.tr("stocks"),
             )

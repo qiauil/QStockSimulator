@@ -45,20 +45,20 @@ class DataProviderInItFrame(ScrollerSettings):
     def __init__(self, data_provider_setups:Sequence[DataProviderGUISetup],
                  parent=None):
         self.data_provider_setups = data_provider_setups
-        super().__init__("New Project", show_control=True, 
-                         next_button_text="Next", 
+        super().__init__(self.tr("New Project"), show_control=True, 
+                         next_button_text=self.tr("Next"), 
                          show_back_button=False, parent=parent)
         
     def _init_widget(self):
-        project_folder_group = self.add_setting_card_group("Project Location")
-        self.project_folder_card = FolderSelectCard(parent=project_folder_group,empty_folder_content="No folder selected, will not save the project")
+        project_folder_group = self.add_setting_card_group(self.tr("Project Location"))
+        self.project_folder_card = FolderSelectCard(parent=project_folder_group,empty_folder_content=self.tr("No folder selected, will not save the project"))
         project_folder_group.addSettingCard(self.project_folder_card)
 
-        provider_group = self.add_setting_card_group("Data Provider")
+        provider_group = self.add_setting_card_group(self.tr("Data Provider"))
         combo_box_card = ExpandWidgetCard(
             icon=Icon.DATA,
-            title="Data Provider",
-            content="The source of the stock data",
+            title=self.tr("Data Provider"),
+            content=self.tr("The source of the stock data"),
             parent=provider_group
         )
         provider_group.addSettingCard(combo_box_card)
@@ -97,27 +97,27 @@ class DataProviderInItFrame(ScrollerSettings):
 class StockSelectorFrame(ScrollerSettings):
 
     def __init__(self, parent=None):
-        super().__init__(title="New Project", 
+        super().__init__(title=self.tr("New Project"), 
                          show_control=True, parent=parent,)
 
     def _init_widget(self):
         self._stock_list=None
-        stock_select_setting_group=self.add_setting_card_group("Select Stock")
+        stock_select_setting_group=self.add_setting_card_group(self.tr("Select Stock"))
         self.current_stock_card=ExpandWidgetCard(
             icon=Icon.NUMBER,
-            title="Current Stock",
-            content="The stock that will be used for trade",
+            title=self.tr("Current Stock"),
+            content=self.tr("The stock that will be used for trade"),
             parent=stock_select_setting_group
         )
         stock_select_setting_group.addSettingCard(self.current_stock_card)
         self.current_stock_card.setExpand(True)
-        self.current_stock_label = BodyLabel("None")
+        self.current_stock_label = BodyLabel(self.tr("None"))
         self.current_stock_card.add_widget(self.current_stock_label)
         select_model_widget = QWidget(parent=self.current_stock_card)
         select_model_layout = QHBoxLayout(select_model_widget)
         select_model_comobox = ComboBox(parent=select_model_widget)
-        select_model_comobox.addItem("Random Selected")
-        select_model_comobox.addItem("Manually Select")
+        select_model_comobox.addItem(self.tr("Random Selected"))
+        select_model_comobox.addItem(self.tr("Manually Select"))
         select_model_comobox.currentIndexChanged.connect(
             lambda index: self.to_random_select_model() if index==0 else self.to_manual_select_model()
         )
@@ -126,8 +126,8 @@ class StockSelectorFrame(ScrollerSettings):
         self.refresh_button.clicked.connect(lambda: self.current_stock_label.setText(random.choice(self.stock_list)))
         select_model_layout.addWidget(self.refresh_button)
         select_model_card=TransparentWidgetCard(icon=Icon.SELECTED,
-                                                title="Select Model",
-                                                content="Select the model randomly or manually",
+                                                title=self.tr("Select Model"),
+                                                content=self.tr("Select the model randomly or manually"),
                                                 parent=self.current_stock_card)
         select_model_card.add_widget(select_model_widget)
         self.current_stock_card.add_content_widget(select_model_card)
@@ -145,12 +145,12 @@ class StockSelectorFrame(ScrollerSettings):
     @property
     def stock_list(self):
         if self._stock_list is None:
-            raise ValueError("Stock list is not set")
+            raise ValueError(self.tr("Stock list is not set"))
         return self._stock_list
     
     def set_stock_list(self,stock_list):
         if len(stock_list)==0:
-            print("No stock data available")
+            print(self.tr("No stock data available"))
             return False
         self._stock_list=stock_list
         self.stock_list_widget.clear()
@@ -180,28 +180,28 @@ class StockSelectorFrame(ScrollerSettings):
 class ConfigTradeFrame(ScrollerSettings):
     def __init__(self, trade_cores:Sequence[TradeCoreGUISetup], parent=None):
         self.trade_cores=trade_cores
-        super().__init__(title="New Project", 
-                         next_button_text="Start Trade",parent=parent)
+        super().__init__(title=self.tr("New Project"), 
+                         next_button_text=self.tr("Start Trade"),parent=parent)
 
     def _init_widget(self):
-        simulation_config_group = self.add_setting_card_group("Simulation Configuration")
+        simulation_config_group = self.add_setting_card_group(self.tr("Simulation Configuration"))
         simulation_length_card = WidgetCard(
             icon=Icon.RULER,
-            title="Simulation Length",
-            content="Unit: day",
+            title=self.tr("Simulation Length"),
+            content=self.tr("Unit: day"),
             parent=simulation_config_group
         )
         simulation_config_group.addSettingCard(simulation_length_card)
         self.simulation_length_slider = Slider(Qt.Orientation.Horizontal,parent=self)
         self.simulation_length_slider.setRange(1,100)
-        self.simulation_length_slider.valueChanged.connect(lambda value: simulation_length_card.setTitle(f"Simulation Length: {value}"))
+        self.simulation_length_slider.valueChanged.connect(lambda value: simulation_length_card.setTitle(self.tr("Simulation Length:")+f" {value}"))
         self.simulation_length_slider.setMinimumWidth(200)
         simulation_length_card.add_widget(self.simulation_length_slider)
 
         trade_rule_card=ExpandWidgetCard(
             icon=Icon.CODE,
-            title="Trade Rule",
-            content="The rule for the trade simulation",
+            title=self.tr("Trade Rule"),
+            content=self.tr("The rule for the trade simulation"),
             parent=simulation_config_group
         )
         simulation_config_group.addSettingCard(trade_rule_card)
@@ -209,8 +209,8 @@ class ConfigTradeFrame(ScrollerSettings):
         trade_rule_card.add_widget(self.trade_core_selector)
         initial_amount_card=TransparentWidgetCard(
             icon=Icon.MONEY,
-            title="Initial Amount",
-            content="× intial stock price",
+            title=self.tr("Initial Amount"),
+            content=self.tr("× intial stock price"),
             parent=simulation_config_group
         )
         trade_rule_card.add_content_widget(initial_amount_card)
@@ -264,9 +264,6 @@ class DataCreator(QWidget):
         super().__init__(parent)
         self.parent_window = parent_window
         self.main_layout = QVBoxLayout(self)
-        #self.main_layout.setContentsMargins(10,0,0,0)
-        #self.main_layout.addWidget(TitleLabel("New Project", parent=self))
-        #self.main_layout.addSpacing(10)
         self.stacked_widget = QStackedWidget(self)
         FluentStyleSheet.FLUENT_WINDOW.apply(self.stacked_widget)
         self.main_layout.addWidget(self.stacked_widget)
@@ -293,7 +290,7 @@ class DataCreator(QWidget):
 
     def on_folder_changed(self,folder:str):
         if len(os.listdir(folder))!=0:
-            self.sigShowError.emit("Error", "The selected project folder is not empty")
+            self.sigShowError.emit(self.tr("Error"), self.tr("The selected project folder is not empty"))
             self.provider_init.project_folder_card.set_folder(None)
 
     @property
@@ -309,14 +306,14 @@ class DataCreator(QWidget):
             self.parent_window.progressive_run(func, message=message, **kwargs)
         
     def next_provider_init(self):
-        self.progressive_run(self._next_provider_init, message="Loading stock list...")
+        self.progressive_run(self._next_provider_init, message=self.tr("Loading stock list..."))
     
     def _next_provider_init(self):
         if self.stock_selector.set_stock_list(self.current_provider.get_stock_list()):
             self.stacked_widget.setCurrentWidget(self.stock_selector)
         else:
             self.provider_init.reset()
-            self.sigShowError.emit("Error", "No stock data available")
+            self.sigShowError.emit(self.tr("Error"), self.tr("No stock data available"))
 
     def back_stock_selector(self):
         self.provider_init.reset()
@@ -324,7 +321,7 @@ class DataCreator(QWidget):
 
     def next_stock_selector(self):
         self.progressive_run(self._next_stock_selector,
-                             message="Loading stock data...",
+                             message=self.tr("Loading stock data..."),
                              )
     
     def _next_stock_selector(self):

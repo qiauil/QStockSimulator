@@ -2,25 +2,23 @@ from qfluentwidgets import FluentWindow, BodyLabel, FluentIcon,NavigationItemPos
 from ...libs.style import Icon
 from ..view.project_creator import DataCreator
 from ..view.project_loader import ProjectLoader
-from .window_basics import ProgressiveMixin
+from ..view.setting import Setting
+from .window_basics import SideMenuBarWindow
+from ...libs.config import cfg
+from qfluentwidgets import SystemThemeListener, isDarkTheme
+from PyQt6.QtGui import QIcon
 
-class StartWindow(FluentWindow,ProgressiveMixin):
+class StartWindow(SideMenuBarWindow):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFixedSize(650, 650)
-        self.setResizeEnabled(False)
-        self.titleBar.maxBtn.hide()
-        self.navigationInterface.setReturnButtonVisible(False)
-        self.navigationInterface.setExpandWidth(200)
-        self.navigationInterface.setAcrylicEnabled(True)
 
         data_selector = DataCreator(parent=self,parent_window=self)
         data_selector.setObjectName("data_selector")
         self.addSubInterface(
             data_selector,
             icon=Icon.NEWPROJECT,
-            text="New Project",
+            text=self.tr("New Project"),
             isTransparent=True
         )
         project_loader = ProjectLoader(parent=self,parent_window=self)
@@ -28,22 +26,21 @@ class StartWindow(FluentWindow,ProgressiveMixin):
         self.addSubInterface(
             project_loader,
             icon=Icon.OPEN,
-            text="Load Project",
+            text=self.tr("Load Project"),
             isTransparent=True
         )
-        label_3=BodyLabel(
-            "Welcome to Stock Simulator",
-            parent=self
-        )
-        label_3.setObjectName("title3")
+        setting_view = Setting(parent=self)
+        setting_view.setObjectName("setting_view")
         self.navigationInterface.addSeparator(position=NavigationItemPosition.BOTTOM)
         self.addSubInterface(
-            label_3,
+            setting_view,
             icon=FluentIcon.SETTING,
-            text="Setting",
+            text=self.tr("Setting"),
             position=NavigationItemPosition.BOTTOM,
             isTransparent=True
         )
+        self.themeListener.start()
+        
 """
 if __name__ == "__main__":
     import sys

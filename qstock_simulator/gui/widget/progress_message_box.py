@@ -33,7 +33,7 @@ class ProgressMessageBox(MaskDialogBase):
         self.card_layout = QVBoxLayout(self.card)
         self.progress_ring = IndeterminateProgressRing(parent=self.widget)
         self.card_layout.addWidget(self.progress_ring,alignment=Qt.AlignmentFlag.AlignCenter)
-        self.content_label = BodyLabel("Loading...", parent=self.widget)
+        self.content_label = BodyLabel(self.tr("Loading..."), parent=self.widget)
         self.card_layout.addWidget(self.content_label,alignment=Qt.AlignmentFlag.AlignCenter)
         if not show_content_label:
             self.content_label.hide()

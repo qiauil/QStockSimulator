@@ -51,7 +51,8 @@ class ScrollerSettings(QWidget):
         self.main_layout.addSpacing(10)
 
         if not show_control:
-            self.control_layout.hide()
+            self.back_button.hide()
+            self.next_button.hide()
         if not show_back_button:
             self.back_button.hide()
 

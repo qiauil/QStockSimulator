@@ -24,7 +24,7 @@ class TradeWindow(TitleMenuWindow):
         self.main_layout.addWidget(self.control_pannel)
         # menu
 
-        self.state_info_action = Action("State info", parent=self)
+        self.state_info_action = Action(self.tr("State info"), parent=self)
         self.state_info_action.setIcon(FluentIcon.VIEW)
         def state_info_action_triggered():
             if self.control_pannel.info_plot_card.isVisible():

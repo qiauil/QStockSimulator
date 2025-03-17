@@ -12,11 +12,11 @@ class ChineseStockMarketTradeCoreInitGUI(QWidget):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(2)
         configs=[
-            ("Commission rate:",3.0,"Unit: ten-thousandth",Icon.MONEY),
-            ("Min commission fee:",5.0,"Unit: RMB",Icon.MONEY),
-            ("Tax rate:",0.1,"Unit: ten-thousandth",Icon.MONEY),
-            ("Transfer fee rate:",0.1,"Unit: ten-thousandth",Icon.MONEY),
-            ("Trade fee rate:",0.341,"Unit: ten-thousandth",Icon.MONEY)
+            (self.tr("Commission rate:"),3.0,self.tr("Unit: ten-thousandth"),Icon.MONEY),
+            (self.tr("Min commission fee:"),5.0,self.tr("Unit: RMB"),Icon.MONEY),
+            (self.tr("Tax rate:"),0.1,self.tr("Unit: ten-thousandth"),Icon.MONEY),
+            (self.tr("Transfer fee rate:"),0.1,self.tr("Unit: ten-thousandth"),Icon.MONEY),
+            (self.tr("Trade fee rate:"),0.341,self.tr("Unit: ten-thousandth"),Icon.MONEY)
         ]
         self.spinboxs = []
         for config in configs:

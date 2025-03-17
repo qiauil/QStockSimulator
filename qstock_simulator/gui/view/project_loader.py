@@ -48,11 +48,11 @@ class ProjectLoader(ScrollerSettings):
         self.parent_window = parent_window
         if parent is None:
             parent = parent_window
-        super().__init__("Load Project", True, "Load", show_back_button=False, parent=parent)
+        super().__init__(self.tr("Load Project"), True, self.tr("Load"), show_back_button=False, parent=parent)
 
     def _init_widget(self):
-        card_group = self.add_setting_card_group("Load Project")
-        self.folder_select_card = FolderSelectCard("Select", parent=self)
+        card_group = self.add_setting_card_group(self.tr("Load Project"))
+        self.folder_select_card = FolderSelectCard(self.tr("Select"), parent=self)
         card_group.addSettingCard(self.folder_select_card)
         self.next_button.setEnabled(False)
         self.folder_select_card.sigFolderChanged.connect(self.on_folder_changed)
@@ -61,7 +61,7 @@ class ProjectLoader(ScrollerSettings):
     def on_folder_changed(self,folder:str):
         files=["config.yaml","stock.h5"]
         if not all([os.path.exists(os.path.join(folder,file)) for file in files]):
-            self.show_error_info("Error", "The selected folder is not a valid project folder")
+            self.show_error_info(self.tr("Error"), self.tr("The selected folder is not a valid project folder"))
             self.folder_select_card.set_folder(None)
         else:
             self.next_button.setEnabled(True)

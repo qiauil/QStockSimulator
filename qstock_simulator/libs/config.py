@@ -164,3 +164,18 @@ class InitParaRecorder():
             raise ValueError("The `args` parameter is currently not supported in saving to yaml file as it is hard to reconstruct the original call.")
         write_yaml(self.init_paras,path)
 
+from qfluentwidgets import (qconfig, QConfig, ConfigItem, OptionsConfigItem, BoolValidator,
+                            OptionsValidator, RangeConfigItem, RangeValidator,
+                            FolderListValidator, Theme, FolderValidator, ConfigSerializer, __version__)
+
+class Config(QConfig):
+    """ Config of application """
+
+    dpiScale = OptionsConfigItem(
+        "MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]), restart=True)
+    #language = OptionsConfigItem(
+    #    "MainWindow", "Language", Language.AUTO, OptionsValidator(Language), LanguageSerializer(), restart=True)
+
+cfg = Config()
+cfg.themeMode.value = Theme.AUTO
+qconfig.load('config/config.json', cfg)

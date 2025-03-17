@@ -26,9 +26,9 @@ class StockInfoBar(QWidget):
         self.time_label.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.card_layout.addWidget(self.time_label)
 
-        self.initial_value_label = self._creat_label_groups("Initial:")
+        self.initial_value_label = self._creat_label_groups(self.tr("Initial:"))
 
-        self.end_value_label, end_value_layout = self._creat_label_groups("End:", return_layout=True)
+        self.end_value_label, end_value_layout = self._creat_label_groups(self.tr("End:"), return_layout=True)
         self.end_value_label.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.price_change_label = BodyLabel("(+32, +0.32%)")
         self.price_change_label.setTextColor(QColor("green"),QColor("green"))
@@ -37,15 +37,15 @@ class StockInfoBar(QWidget):
         end_value_layout.addWidget(self.price_change_label)
 
         self.price_change_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.lowest_value_label = self._creat_label_groups("Lowest:")
-        self.highest_value_label,highest_value_layout = self._creat_label_groups("Highest:",return_layout=True)
+        self.lowest_value_label = self._creat_label_groups(self.tr("Lowest:"))
+        self.highest_value_label,highest_value_layout = self._creat_label_groups(self.tr("Highest:"),return_layout=True)
         self.highest_value_label.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.price_deviation_label = BodyLabel("(+72)")
         self.price_deviation_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
         highest_value_layout.addWidget(self.price_deviation_label)
 
 
-        self.volume_label = self._creat_label_groups("Volume:")
+        self.volume_label = self._creat_label_groups(self.tr("Volume:"))
 
         self.stock_info_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
