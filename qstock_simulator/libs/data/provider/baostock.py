@@ -68,11 +68,15 @@ class BaoStockDataProvider(DataProvider):
         bs_check_error(bs.logout())
         return res
     
-    def get_data_handler(self, stock_code: str) -> DataHandler:
+    def get_data_handler(self, 
+                         stock_code: str,
+                         logged_out_immediately: bool = True
+                         ) -> DataHandler:
         return BaoStockDataHandler(stock_code, 
                                    self.start_date,
                                    self.latest_trade_date,
-                                   logged_in=False)
+                                   logged_in=False,
+                                   logged_out_immediately=logged_out_immediately)
     
 class BaoStockDataProviderGUISetup(DataProviderGUISetup):
 

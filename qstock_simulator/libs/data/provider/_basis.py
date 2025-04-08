@@ -6,7 +6,7 @@ class DataProvider:
     def get_stock_list(self) -> list:
         raise NotImplementedError
 
-    def get_data_handler(self,stock_code:str) -> DataHandler:
+    def get_data_handler(self,stock_code:str,**kwargs) -> DataHandler:
         raise NotImplementedError
 
     def on_exit(self):

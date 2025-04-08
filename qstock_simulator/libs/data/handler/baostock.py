@@ -17,6 +17,7 @@ class BaoStockDataHandler(DataHandler):
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         logged_in: bool = False,
+        logged_out_immediately: bool = True,
     ):
         super().__init__()
         if not logged_in:
@@ -24,7 +25,8 @@ class BaoStockDataHandler(DataHandler):
         self.day_data = self._collect_data(stock_code, start_date, end_date, "d")
         self.week_data = self._collect_data(stock_code, start_date, end_date, "w")
         self.month_data = self._collect_data(stock_code, start_date, end_date, "m")
-        bs_check_error(bs.logout())
+        if logged_out_immediately:
+            bs_check_error(bs.logout())
 
     def _collect_data(
         self,

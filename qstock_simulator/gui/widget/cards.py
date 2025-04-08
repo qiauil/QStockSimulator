@@ -1,7 +1,7 @@
 from qfluentwidgets import PushSettingCard, FluentIcon, SettingCard, ComboBox, FluentIconBase, ExpandSettingCard
 from PyQt6.QtWidgets import QFileDialog, QWidget
 from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 from typing import Union,Sequence
 from PyQt6.QtCore import pyqtSignal
 
@@ -15,7 +15,7 @@ class FolderSelectCard(PushSettingCard):
                  empty_folder_content="No folder selected", parent=None):
         super().__init__(            
             button_text,
-            icon=FluentIcon.FOLDER,
+            icon=icon,
             title=title,
             content=empty_folder_content,
             parent=parent,)
@@ -37,9 +37,21 @@ class FolderSelectCard(PushSettingCard):
             folder=self.empty_folder_content
         self.setContent(folder)
 
+    def sizeHint(self):
+        return QSize(100, 70)
     @property
     def current_folder(self):
         return self._current_folder
+
+class TransparentFolderSelectCard(FolderSelectCard):
+    def __init__(self, button_text="Select", 
+                 icon=FluentIcon.FOLDER, 
+                 title="Project Folder", 
+                 empty_folder_content="No folder selected", parent=None):
+        super().__init__(button_text, icon, title, empty_folder_content, parent)
+    
+    def paintEvent(self, e):
+        return None
 
 class WidgetCard(SettingCard):
     """ Setting card with a combo box """

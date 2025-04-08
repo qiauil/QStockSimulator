@@ -1,2 +1,3 @@
 from ._basis import DataProvider, DataProviderGUISetup
 from .baostock import BaoStockDataProvider, BaoStockDataProviderGUISetup
+from .local_hhdf5 import LocalHDF5DataProvider, LocalHDF5DataProviderGUISetup

@@ -1,14 +1,9 @@
 from ...libs.data import DataProvider,DataProviderGUISetup
 from ...libs.trade_core import TradeCoreGUISetup
 from qfluentwidgets import (
-    PushButton,
-    PrimaryPushButton,
     FluentStyleSheet,
     ComboBox,
-    RadioButton,
     ListWidget,
-    HeaderCardWidget,
-    SimpleCardWidget,
     BodyLabel,
     ToolButton,
     FluentIcon,
@@ -16,23 +11,17 @@ from qfluentwidgets import (
     SpinBox,
     InfoBar,
     InfoBarPosition,
-    ScrollArea,
-    TitleLabel,
-    SettingCardGroup,
 )
-from qfluentwidgets.components.dialog_box.mask_dialog_base import MaskDialogBase
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtWidgets import QSizePolicy,QHBoxLayout, QVBoxLayout, QWidget, QStackedWidget, QListWidgetItem, QBoxLayout
+from PyQt6.QtWidgets import QSizePolicy, QHBoxLayout, QVBoxLayout, QWidget, QStackedWidget, QListWidgetItem, QBoxLayout
 from typing import Sequence
 import random
-from ..widget.progress_message_box import ProgressMessageBox
-from ...libs.data.provider import BaoStockDataProviderGUISetup
+from ...libs.data.provider import BaoStockDataProviderGUISetup,LocalHDF5DataProviderGUISetup
 from ...libs.trade_core import ChineseStockMarketTradeCoreGUISetup
 from ...libs.io import create_project
 from ...apps.main_trade import MainTrade
 from ...libs.style import Icon
 from ..widget.cards import FolderSelectCard, ExpandWidgetCard, TransparentWidgetCard, WidgetCard
-from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import pyqtSignal
 import random,os
 from typing import Optional
@@ -66,14 +55,20 @@ class DataProviderInItFrame(ScrollerSettings):
         combo_box_card.add_widget(self.provider_selector)
         self._current_provider=None
         self.provider_init_stacker = QStackedWidget(self)
+        def on_provider_changed(index:int):
+            self.provider_init_stacker.setCurrentIndex(index)
+            height = self.provider_init_stacker.widget(index).sizeHint().height()
+            self.provider_init_stacker.setFixedHeight(height)
+            combo_box_card._adjustViewSize()
         for provider_setup in self.data_provider_setups:
-            self.provider_init_stacker.addWidget(provider_setup._init_widget(self))
+            self.provider_init_stacker.addWidget(provider_setup._init_widget(parent=self))
             self.provider_selector.addItem(provider_setup.name)
             self.provider_selector.currentIndexChanged.connect(
-                self.provider_init_stacker.setCurrentIndex
+                on_provider_changed
             )
         combo_box_card.add_content_widget(self.provider_init_stacker)
         combo_box_card.setExpand(True)
+        
 
     @property
     def current_provider(self)->DataProvider:
@@ -256,8 +251,7 @@ class DataCreator(QWidget):
     sigShowError = pyqtSignal(str, str)
 
     def __init__(self, 
-                 project_dir:Optional[str]=None,
-                 data_provider_setups: Sequence[DataProviderGUISetup]=[BaoStockDataProviderGUISetup()], 
+                 data_provider_setups: Sequence[DataProviderGUISetup]=[BaoStockDataProviderGUISetup(),LocalHDF5DataProviderGUISetup()], 
                  trade_core_setups: Sequence[TradeCoreGUISetup]=[ChineseStockMarketTradeCoreGUISetup()],
                  parent_window=None,
                  parent=None):   
