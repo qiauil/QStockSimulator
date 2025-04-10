@@ -46,7 +46,7 @@ def default_style_configs() -> ConfigurationsHandler:
 def make_style(style_yaml_file="",**kwargs):
     configs_handler=default_style_configs()
     if style_yaml_file != "":
-            configs_handler.set_config_items_from_yaml(style_yaml_file)
+        configs_handler.set_config_items_from_yaml(style_yaml_file)
     configs_handler.set_config_items(**kwargs)
     return configs_handler.configs()
 

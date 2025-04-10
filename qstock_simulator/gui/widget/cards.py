@@ -1,4 +1,4 @@
-from qfluentwidgets import PushSettingCard, FluentIcon, SettingCard, ComboBox, FluentIconBase, ExpandSettingCard
+from qfluentwidgets import PushSettingCard, FluentIcon, SettingCard, FluentIconBase, ExpandSettingCard, LineEdit
 from PyQt6.QtWidgets import QFileDialog, QWidget
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt, QSize
@@ -69,6 +69,25 @@ class WidgetCard(SettingCard):
     def add_widget(self, widget:QWidget):
         self.hBoxLayout.addWidget(widget, 0, Qt.AlignmentFlag.AlignRight)
         self.hBoxLayout.addSpacing(16)
+
+class LineEditCard(WidgetCard):
+    def __init__(self, icon: Union[str, QIcon, FluentIconBase], 
+                 title, 
+                 content=None,
+                 text="",
+                 parent=None):
+        super().__init__(icon, title, content, None, parent)
+        self.line_edit = LineEdit(self)
+        self.line_edit.setText(text)
+        self.line_edit.setFixedHeight(30)
+        self.line_edit.setClearButtonEnabled(True)
+        self.add_widget(self.line_edit)
+    
+    def text(self):
+        return self.line_edit.text()
+    
+    def set_text(self, text):
+        self.line_edit.setText(text)
 
 class TransparentWidgetCard(WidgetCard):
 

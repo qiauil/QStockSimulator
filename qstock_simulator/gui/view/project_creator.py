@@ -11,6 +11,7 @@ from qfluentwidgets import (
     SpinBox,
     InfoBar,
     InfoBarPosition,
+    LineEdit,
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import QSizePolicy, QHBoxLayout, QVBoxLayout, QWidget, QStackedWidget, QListWidgetItem, QBoxLayout
@@ -21,9 +22,10 @@ from ...libs.trade_core import ChineseStockMarketTradeCoreGUISetup
 from ...libs.io import create_project
 from ...apps.main_trade import MainTrade
 from ...libs.style import Icon
-from ..widget.cards import FolderSelectCard, ExpandWidgetCard, TransparentWidgetCard, WidgetCard
+from ..widget.cards import FolderSelectCard, ExpandWidgetCard, TransparentWidgetCard, WidgetCard, LineEditCard
+from ...libs.config import cfg
 from PyQt6.QtCore import pyqtSignal
-import random,os
+import random,os,datetime
 from typing import Optional
 
 from ..widget.scroller_settings import ScrollerSettings
@@ -41,7 +43,27 @@ class DataProviderInItFrame(ScrollerSettings):
     def _init_widget(self):
         project_folder_group = self.add_setting_card_group(self.tr("Project Location"))
         self.project_folder_card = FolderSelectCard(parent=project_folder_group,empty_folder_content=self.tr("No folder selected, will not save the project"))
+        self.project_name_card = LineEditCard(
+            icon=Icon.CODE,
+            title=self.tr("Project Name"),
+            content=self.tr("The name of the project"),
+            parent=project_folder_group,
+        )
+        self.project_name_card.line_edit.setPlaceholderText(self.tr("Project Name"))
+        self.project_name_card.line_edit.setClearButtonEnabled(True)
+        self.project_name_card.setVisible(False)
+        if cfg.previous_project_dir.value is not None:
+            self.project_folder_card.set_folder(cfg.get(cfg.previous_project_dir))
+            self.project_name_card.setVisible(True)
+            self.project_name_card.set_text(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+        def on_folder_changed(folder:str):
+            cfg.set(cfg.previous_project_dir, folder)
+            self.project_name_card.setVisible(True)
+            if self.project_name_card.text() == "":
+                self.project_name_card.set_text(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+        self.project_folder_card.sigFolderChanged.connect(on_folder_changed)
         project_folder_group.addSettingCard(self.project_folder_card)
+        project_folder_group.addSettingCard(self.project_name_card)
 
         provider_group = self.add_setting_card_group(self.tr("Data Provider"))
         combo_box_card = ExpandWidgetCard(
@@ -82,7 +104,13 @@ class DataProviderInItFrame(ScrollerSettings):
 
     @property
     def project_folder(self):
-        return self.project_folder_card.current_folder
+        if self.project_folder_card.current_folder is None:
+            return None
+        else:
+            if self.project_name_card.text() != "":
+                return os.path.join(self.project_folder_card.current_folder, self.project_name_card.text())
+            else:
+                raise ValueError(self.tr("Please set the project name"))
 
     def reset(self):
         if self._current_provider is not None:
@@ -144,16 +172,12 @@ class StockSelectorFrame(ScrollerSettings):
         return self._stock_list
     
     def set_stock_list(self,stock_list):
-        if len(stock_list)==0:
-            print(self.tr("No stock data available"))
-            return False
         self._stock_list=stock_list
         self.stock_list_widget.clear()
         for stock in stock_list:
             item = QListWidgetItem(stock)
             self.stock_list_widget.addItem(item)
         self.current_stock_label.setText(random.choice(stock_list))
-        return True
 
     def to_random_select_model(self):
         self.refresh_button.setEnabled(True)
@@ -303,11 +327,18 @@ class DataCreator(QWidget):
         self.progressive_run(self._next_provider_init, message=self.tr("Loading stock list..."))
     
     def _next_provider_init(self):
-        if self.stock_selector.set_stock_list(self.current_provider.get_stock_list()):
-            self.stacked_widget.setCurrentWidget(self.stock_selector)
-        else:
-            self.provider_init.reset()
-            self.sigShowError.emit(self.tr("Error"), self.tr("No stock data available"))
+        try:
+            project_folder = self.provider_init.project_folder # test whether the name is empty
+            stock_list = self.current_provider.get_stock_list()
+            if len(stock_list) == 0:
+                self.provider_init.reset()
+                self.sigShowError.emit(self.tr("Error"), self.tr("No stock data available"))
+            else:
+                self.stock_selector.set_stock_list(stock_list)
+                self.stacked_widget.setCurrentWidget(self.stock_selector)
+        except Exception as e:
+            self.sigShowError.emit(self.tr("Error"), str(e))
+            
 
     def back_stock_selector(self):
         self.provider_init.reset()

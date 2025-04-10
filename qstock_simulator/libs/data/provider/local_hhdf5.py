@@ -1,7 +1,7 @@
 from ..handler import DataHandler, HDF5Handler
 from ._basis import DataProvider, DataProviderGUISetup
-from .._bs_utils import bs_check_error
 from ....gui.widget.cards import TransparentFolderSelectCard
+from ...config import cfg
 from PyQt6.QtWidgets import QSizePolicy
 import os
 
@@ -40,10 +40,17 @@ class LocalHDF5DataProviderGUISetup(DataProviderGUISetup):
         self._gui=None
 
     def _init_widget(self, parent):
-        self._gui = TransparentFolderSelectCard(parent=parent)
+        self._gui = TransparentFolderSelectCard(parent=parent,title=self.tr("Local HDF5 Data Folder"))
+        if cfg.get(cfg.previous_local_hdf5_dir) is not None:
+            self._gui.set_folder(cfg.get(cfg.previous_local_hdf5_dir))
+        self._gui.sigFolderChanged.connect(
+            lambda folder: cfg.set(cfg.previous_local_hdf5_dir, folder)
+        )
         return self._gui
     
     def get_data_provider(self):
         if self._gui is None:
-            raise RuntimeError("GUI not initialized")
+            raise RuntimeError(self.tr("GUI not initialized"))
+        if self._gui.current_folder is None:
+            raise RuntimeError(self.tr("No local data folder selected"))
         return LocalHDF5DataProvider(self._gui.current_folder)

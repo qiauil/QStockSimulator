@@ -173,6 +173,12 @@ class Config(QConfig):
 
     dpiScale = OptionsConfigItem(
         "MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]), restart=True)
+    previous_project_dir = ConfigItem("MainWindow",
+                                      "previousProjectDir",
+                                      default=None, validator=None, restart=False)
+    previous_local_hdf5_dir = ConfigItem("LocalHDF5Data",
+                                        "previousLocalHDF5Dir",
+                                        default=None, validator=None, restart=False)
     #language = OptionsConfigItem(
     #    "MainWindow", "Language", Language.AUTO, OptionsValidator(Language), LanguageSerializer(), restart=True)
 
