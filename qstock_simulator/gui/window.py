@@ -1,5 +1,5 @@
-from ..widget.progress_message_box import ProgressMessageBox
-from ...libs.utils import FunctionThread
+from .widget.progress_message_box import ProgressMessageBox
+from ..libs.utils import FunctionThread
 from qfluentwidgets.components.widgets.frameless_window import FramelessWindow
 from qfluentwidgets.common.animation import BackgroundAnimationWidget
 from qfluentwidgets import (
@@ -24,7 +24,7 @@ from PyQt6.QtGui import QColor, QIcon, QPainter
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtWidgets import QApplication, QWidget
 from typing import Literal
-from ...libs.config import cfg
+from ..libs.config import cfg
 from PyQt6.QtCore import QTimer
 import sys
 
@@ -43,7 +43,6 @@ class SplashWindow(BackgroundAnimationWidget, FramelessWindow):
         self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
         self.show()
         QApplication.processEvents()
-
 
 class DefaultWindow(BackgroundAnimationWidget, FramelessWindow):
     def __init__(
@@ -110,7 +109,6 @@ class DefaultWindow(BackgroundAnimationWidget, FramelessWindow):
     def isMicaEffectEnabled(self):
         return self._isMicaEnabled
 
-
 class TitleMenuWindow(DefaultWindow):
     def __init__(
         self,
@@ -173,7 +171,6 @@ class TitleMenuWindow(DefaultWindow):
             dark_action.setCheckable(True)
             light_action.setCheckable(True)
             auto_action.setChecked(True)
-
 
 class ProgressiveMixin:
 

@@ -1,10 +1,7 @@
-from ..widget.scroller_settings import ScrollerSettings
+from ...gui.widget.scroller_settings import ScrollerSettings
 from ...libs.config import cfg
-from qfluentwidgets import (SettingCardGroup, SwitchSettingCard, FolderListSettingCard,
-                            OptionsSettingCard, PushSettingCard,
-                            HyperlinkCard, PrimaryPushSettingCard, ScrollArea,
-                            ComboBoxSettingCard, ExpandLayout, Theme, CustomColorSettingCard,
-                            setTheme, setThemeColor, RangeSettingCard, isDarkTheme,FluentIcon,PushButton)
+from qfluentwidgets import (OptionsSettingCard, CustomColorSettingCard,
+                            setTheme, setThemeColor,FluentIcon)
 
 class Setting(ScrollerSettings):
 

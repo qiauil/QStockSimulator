@@ -1,14 +1,11 @@
-from qfluentwidgets import FluentWindow, BodyLabel, FluentIcon,NavigationItemPosition
+from qfluentwidgets import FluentIcon,NavigationItemPosition
 from ...libs.style import Icon
-from ..view.project_creator import DataCreator
-from ..view.project_loader import ProjectLoader
-from ..view.setting import Setting
-from .window_basics import SideMenuBarWindow
-from ...libs.config import cfg
-from qfluentwidgets import SystemThemeListener, isDarkTheme
-from PyQt6.QtGui import QIcon
+from ...apps.project_creator import DataCreator
+from ...apps.project_loader import ProjectLoader
+from ...apps.setting import Setting
+from ...gui.window import SideMenuBarWindow
 
-class StartWindow(SideMenuBarWindow):
+class StartUpWindow(SideMenuBarWindow):
 
     def __init__(self, parent=None):
         super().__init__(parent)
