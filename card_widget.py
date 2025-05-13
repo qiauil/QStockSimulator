@@ -1,6 +1,5 @@
 from qstock_simulator.libs.config import cfg
 from qstock_simulator.apps.start_up import StartUpWindow
-from qfluentwidgets import setTheme, Theme
 from PyQt6.QtCore import Qt
 
 if __name__ == "__main__":

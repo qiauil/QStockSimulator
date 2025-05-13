@@ -1,6 +1,6 @@
 from qfluentwidgets import FluentIcon,NavigationItemPosition
 from ...libs.style import Icon
-from ...apps.project_creator import DataCreator
+from ...apps.project_creator import ProjectCreator
 from ...apps.project_loader import ProjectLoader
 from ...apps.setting import Setting
 from ...gui.window import SideMenuBarWindow
@@ -10,7 +10,7 @@ class StartUpWindow(SideMenuBarWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        data_selector = DataCreator(parent=self,parent_window=self)
+        data_selector = ProjectCreator(parent=self,parent_window=self)
         data_selector.setObjectName("data_selector")
         self.addSubInterface(
             data_selector,
@@ -37,13 +37,3 @@ class StartUpWindow(SideMenuBarWindow):
             isTransparent=True
         )
         self.themeListener.start()
-        
-"""
-if __name__ == "__main__":
-    import sys
-    from PyQt6.QtWidgets import QApplication
-    app = QApplication(sys.argv)
-    window = StartWindow()
-    window.show()
-    sys.exit(app.exec())
-"""

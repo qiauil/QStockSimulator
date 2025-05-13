@@ -90,7 +90,7 @@ class _TradeWindow(TitleMenuWindow):
         )
 
 
-class TradeSimulator(_TradeWindow):
+class TradeSimulatorWindow(_TradeWindow):
 
     def __init__(
         self,

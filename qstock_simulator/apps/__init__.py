@@ -1,1 +1,1 @@
-from .trade_simulator import TradeSimulator
+from .trade_simulator import TradeSimulatorWindow

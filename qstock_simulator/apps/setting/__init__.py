@@ -2,6 +2,7 @@ from ...gui.widget.scroller_settings import ScrollerSettings
 from ...libs.config import cfg
 from qfluentwidgets import (OptionsSettingCard, CustomColorSettingCard,
                             setTheme, setThemeColor,FluentIcon)
+from ...gui.window import DefaultWindow
 
 class Setting(ScrollerSettings):
 
@@ -47,3 +48,12 @@ class Setting(ScrollerSettings):
         )
         cfg.themeChanged.connect(setTheme)
         self.themeColorCard.colorChanged.connect(lambda c: setThemeColor(c))
+
+class SettingWindow(DefaultWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(self.tr("Setting"))
+        self.setMinimumSize(600, 700)
+        self.setObjectName("setting_window")
+        self.seeting=Setting(self)
+        self.main_layout.addWidget(self.seeting)

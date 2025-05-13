@@ -19,7 +19,6 @@ from PyQt6.QtWidgets import (
 )
 from typing import Sequence
 import random
-from ...libs.io import create_project
 from ...libs.style import Icon
 from ...gui.widget.cards import (
     FolderSelectCard,
@@ -312,4 +311,3 @@ class ConfigTradeFrame(ScrollerSettings):
     @property
     def initial_avaliable_amount(self) -> float:
         return self.initial_amount_input.value()
-

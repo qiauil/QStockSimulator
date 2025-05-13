@@ -2,12 +2,12 @@ from qfluentwidgets.components.dialog_box.mask_dialog_base import MaskDialogBase
 from PyQt6.QtWidgets import QWidget
 from typing import Sequence
 from ...libs.io import create_project
-from ..trade_simulator import TradeSimulator
+from ..trade_simulator import TradeSimulatorWindow
 from ...gui.widget.cards import FolderSelectCard
 import os
 from ...libs.io import load_project
-
 from ...gui.widget.scroller_settings import ScrollerSettings
+from ...gui.window import DefaultWindow
 
 
 class ProjectLoader(ScrollerSettings):
@@ -50,7 +50,7 @@ class ProjectLoader(ScrollerSettings):
         from ...gui.window import TitleMenuWindow
 
         self.parent_window.close()
-        main_trade = TradeSimulator(
+        main_trade = TradeSimulatorWindow(
             data_handler=data_handler,
             trade_core=trade_core,
             start_index=start_index,
@@ -62,3 +62,14 @@ class ProjectLoader(ScrollerSettings):
         # self.back_button.setVisible(True)
         # self.back_button.clicked.connect(lambda:main_trade.components[0].widget.day_plotter.move_to_end())
         # self.back_button.clicked.connect(lambda:print(main_trade.components[0].widget.day_plotter.price_plotter.main_plotter.viewRect()))
+
+class ProjectLoaderWindow(DefaultWindow):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        super().__init__(parent)
+        self.setWindowTitle(self.tr("Load Project"))
+        self.setMinimumSize(600, 700)
+        self.setObjectName("projector_loader_window")
+        self.project_loader = ProjectLoader(self, self)
+        self.main_layout.addWidget(self.project_loader)
