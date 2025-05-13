@@ -19,13 +19,15 @@ from ...libs.data.provider import (
 )
 from ...libs.trade_core import ChineseStockMarketTradeCoreGUISetup
 from ...libs.io import create_project
-from ..trade_simulator import TradeSimulator
+from ..trade_simulator import TradeSimulatorWindow
+from ...gui.window import ProgressiveWindow
 from PyQt6.QtCore import pyqtSignal
 import random, os
 
-from ._view import DataProviderInItFrame,StockSelectorFrame,ConfigTradeFrame
+from ._view import DataProviderInItFrame, StockSelectorFrame, ConfigTradeFrame
 
-class DataCreator(QWidget):
+
+class ProjectCreator(QWidget):
 
     sigShowError = pyqtSignal(str, str)
 
@@ -65,17 +67,6 @@ class DataCreator(QWidget):
         self.trade_config.back_clicked.connect(self.back_trade_config)
         self.trade_config.next_clicked.connect(self.next_trade_config)
         self.sigShowError.connect(self.show_error_info)
-
-        self.provider_init.project_folder_card.sigFolderChanged.connect(
-            self.on_folder_changed
-        )
-
-    def on_folder_changed(self, folder: str):
-        if len(os.listdir(folder)) != 0:
-            self.sigShowError.emit(
-                self.tr("Error"), self.tr("The selected project folder is not empty")
-            )
-            self.provider_init.project_folder_card.set_folder(None)
 
     @property
     def project_dir(self):
@@ -153,7 +144,7 @@ class DataCreator(QWidget):
             self.parent_window.hide()
         else:
             self.hide()
-        window = TradeSimulator(
+        window = TradeSimulatorWindow(
             data_handler=self.data_handler,
             start_index=0,
             end_index=end_index,
@@ -185,3 +176,12 @@ class DataCreator(QWidget):
             duration=3000,
             parent=self.parent(),
         )
+
+class ProjectCreatorWindow(ProgressiveWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(self.tr("Create New Project"))
+        self.setMinimumSize(600, 700)
+        self.setObjectName("data_creator_window")
+        self.data_creator = ProjectCreator(parent=self, parent_window=self)
+        self.main_layout.addWidget(self.data_creator)
