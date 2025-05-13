@@ -203,6 +203,12 @@ class ProgressiveMixin:
     def update_progress_message(self, message: str):
         self.progress_message_box.set_content(message)
 
+class ProgressiveWindow(DefaultWindow, ProgressiveMixin):
+
+    def __init__(self, parent=None,
+                 main_lyout_direction: Literal["horizontal", "vertical"] = "horizontal"):
+        super().__init__(parent, main_lyout_direction)
+
 class SideMenuBarWindow(FluentWindow,ProgressiveMixin):
 
     def __init__(self, parent=None):
