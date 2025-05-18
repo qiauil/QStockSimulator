@@ -1,13 +1,13 @@
 {
     "MainWindow": {
         "DpiScale": "Auto",
-        "previousProjectDir": "C:/Users/qiang/Desktop/local_folder"
+        "previousProjectDir": null
     },
     "LocalHDF5Data": {
         "previousLocalHDF5Dir": "C:/Users/qiang/Desktop/local_stocks"
     },
     "QFluentWidgets": {
         "ThemeColor": "#ff009faa",
-        "ThemeMode": "Dark"
+        "ThemeMode": "Auto"
     }
 }

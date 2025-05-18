@@ -1,0 +1,8 @@
+numpy< 2.0.0
+pandas>=2.2.3
+PyQt6>=6.9.0
+PyQt6_Fluent_Widgets>=1.7.3
+pyqtgraph>=0.13.7
+PyYAML>=6.0.2
+qstock_plotter>=0.0.2
+qstock_plotter @ git+https://github.com/qiauil/QStockPlotter
